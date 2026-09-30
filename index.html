@@ -316,6 +316,11 @@ footer button{background:none;border:none;color:var(--ink-soft);text-decoration:
 .fstage{position:absolute;}
 .fstage-inner{position:absolute;inset:0;padding:4px;overflow:hidden;display:flex;flex-wrap:wrap;align-content:center;justify-content:center;align-items:center;gap:6px;}
 .ftok{width:var(--ftokD,80px);height:var(--ftokD,80px);border-radius:0 50% 50% 50%;background:#fff;display:flex;align-items:center;justify-content:center;text-align:center;font-size:var(--ftokF,10px);line-height:1.18;padding:var(--ftokP,8px);overflow-wrap:anywhere;hyphens:auto;color:var(--teal-900);font-weight:600;position:relative;box-shadow:0 2px 6px rgba(0,0,0,.18);flex:0 0 auto;cursor:pointer;}
+.ftok-layer{position:absolute;inset:0;}
+.ftok-layer .ftok{position:absolute;visibility:hidden;}
+.ftok-layer .fempty{position:absolute;transform:translate(-50%,-50%);}
+.ftok > span:first-child{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:var(--ftokLines,4);overflow:hidden;max-width:100%;}
+.funnel-lbls div span{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:500;color:var(--ink-soft);}
 .ftok:hover{outline:2px solid var(--yellow-400);outline-offset:1px;}
 .ftok.gray{background:#cfcfc6;}
 .ftok.dark{background:var(--teal-900);color:#fff;}
@@ -1800,8 +1805,8 @@ function edgeY(edge, x){
   }
   return edge[edge.length-1][1];
 }
-function bandPolygon(i, samples=14){
-  const x0 = FUNNEL_SPLITS[i], x1 = FUNNEL_SPLITS[i+1], top = [], bot = [];
+function bandPolygon(i, splits=FUNNEL_SPLITS, samples=14){
+  const x0 = splits[i], x1 = splits[i+1], top = [], bot = [];
   for(let k=0; k<samples; k++){
     const x = x0 + (x1-x0)*k/(samples-1);
     top.push([x, edgeY(EDGE_TOP,x)]);
@@ -1809,18 +1814,45 @@ function bandPolygon(i, samples=14){
   }
   return top.concat(bot.reverse());
 }
-/* Safe inner rectangle per band in % of the canvas. The funnel narrows to the right, so the
-   right edge of each band is its tightest point and sets the usable height. */
-const FUNNEL_BOUNDS = STATUS_ORDER.map((s,i)=>{
-  const x0 = FUNNEL_SPLITS[i], x1 = FUNNEL_SPLITS[i+1];
-  const top = edgeY(EDGE_TOP,x1), bot = edgeY(EDGE_BOT,x1), pad = 6;
-  return {left:x0/FUNNEL_W*100, width:(x1-x0)/FUNNEL_W*100, top:(top+pad)/FUNNEL_H*100, height:(bot-top-2*pad)/FUNNEL_H*100};
-});
-function funnelSvg(){
+/* Band widths follow the project count: the silhouette stays fixed, only the seams move, so a
+   crowded stage gets more room and an almost empty one gives it back. The funnel narrows to the
+   right, so a band there needs more width for the same number of projects — the widths are
+   solved iteratively against the usable height at each band's right (tightest) edge. */
+const FUNNEL_MIN_BAND = 90;
+function bandHeightAt(x){ return edgeY(EDGE_BOT,x) - edgeY(EDGE_TOP,x); }
+function funnelLayout(counts, minBand=FUNNEL_MIN_BAND){
+  let splits = FUNNEL_SPLITS.slice();
+  if(counts.some(n=>n>0)){
+    for(let iter=0; iter<8; iter++){
+      const need = counts.map((n,i)=>Math.max(n, 0.5)/bandHeightAt((splits[i]+splits[i+1])/2));
+      let widths = need.map(v=>v);
+      const fixed = widths.map(()=>false);
+      for(let pass=0; pass<widths.length; pass++){
+        const freeNeed = need.reduce((a,v,i)=>fixed[i]?a:a+v, 0);
+        const freeW = FUNNEL_W - fixed.filter(Boolean).length*minBand;
+        widths = need.map((v,i)=>fixed[i] ? minBand : v/freeNeed*freeW);
+        let changed = false;
+        widths.forEach((w,i)=>{ if(!fixed[i] && w<minBand){ fixed[i] = true; changed = true; } });
+        if(!changed) break;
+      }
+      splits = [0];
+      widths.forEach(w=>splits.push(splits[splits.length-1]+w));
+      splits[splits.length-1] = FUNNEL_W;
+    }
+  }
+  const bounds = STATUS_ORDER.map((s,i)=>{
+    const x0 = splits[i], x1 = splits[i+1];
+    const top = edgeY(EDGE_TOP,x1), bot = edgeY(EDGE_BOT,x1), pad = 5;
+    return {left:x0/FUNNEL_W*100, width:(x1-x0)/FUNNEL_W*100, top:(top+pad)/FUNNEL_H*100, height:(bot-top-2*pad)/FUNNEL_H*100};
+  });
+  return {splits, bounds};
+}
+let currentFunnelLayout = funnelLayout([0,0,0,0,0]);
+function funnelSvg(splits=FUNNEL_SPLITS){
   const d = pts=>'M'+pts.map(p=>p[0].toFixed(1)+','+p[1].toFixed(1)).join(' L')+' Z';
-  const bands = STATUS_ORDER.map((s,i)=>`<path d="${d(bandPolygon(i))}" fill="#${STAGE_HEX[s]}"/>`).join('');
+  const bands = STATUS_ORDER.map((s,i)=>`<path d="${d(bandPolygon(i, splits))}" fill="#${STAGE_HEX[s]}"/>`).join('');
   const seams = [1,2,3,4].map(k=>{
-    const x = FUNNEL_SPLITS[k];
+    const x = splits[k];
     return `<line x1="${x}" y1="${edgeY(EDGE_TOP,x)}" x2="${x}" y2="${edgeY(EDGE_BOT,x)}" stroke="#ffffff" stroke-width="2.5"/>`;
   }).join('');
   const outline = `<path d="${d(EDGE_TOP.concat(EDGE_BOT.slice().reverse()))}" fill="none" stroke="rgba(11,40,56,0.35)" stroke-width="2"/>`;
@@ -1864,10 +1896,55 @@ function funnelGroups(items){
 /* Visual order — the same order the detail pages and the detail slides follow. */
 function funnelOrdered(g){ return [].concat(...g.bands, g.onHold, g.stopped, g.archived); }
 
-function ftokHtml(x, tone){
+function ftokHtml(x, tone, band){
   const ci = catInfo(x.p.classification);
   const tip = `${x.title} · ${x.code}${x.p.classification?' · '+ci.label:''}`;
-  return `<div class="ftok ${tone||''}" data-fid="${x.id}" title="${escapeHtml(tip)}"><span>${escapeHtml(x.title)}</span>${tone?'':`<span class="fbadge" style="background:${ci.bg};color:${ci.fg}">${escapeHtml(ci.code)}</span>`}</div>`;
+  return `<div class="ftok ${tone||''}" data-fid="${x.id}"${band!==undefined?` data-band="${band}"`:''} title="${escapeHtml(tip)}"><span>${escapeHtml(x.title)}</span>${tone?'':`<span class="fbadge" style="background:${ci.bg};color:${ci.fg}">${escapeHtml(ci.code)}</span>`}</div>`;
+}
+
+/* Column layout inside one band: every column is as tall as the funnel is at the column's right
+   edge (its tightest point), so tokens follow the taper instead of sitting in the band's
+   smallest rectangle. W/H are the funnel box size in the caller's unit (px or inches). */
+function bandColumns(i, splits, W, H, d, gap, padX, padY){
+  const x0 = splits[i]*W/FUNNEL_W + padX, x1 = splits[i+1]*W/FUNNEL_W - padX;
+  const usable = x1 - x0;
+  const cols = Math.floor((usable+gap)/(d+gap));
+  if(cols<1) return [];
+  const start = x0 + (usable-(cols*(d+gap)-gap))/2;
+  const ux = v=>v/W*FUNNEL_W, uy = v=>v*H/FUNNEL_H;
+  const out = [];
+  for(let c=0; c<cols; c++){
+    const left = start + c*(d+gap), cx = left + d/2, right = left + d;
+    const top = uy(edgeY(EDGE_TOP, ux(right))) + padY, bot = uy(edgeY(EDGE_BOT, ux(right))) - padY;
+    const mid = uy((edgeY(EDGE_TOP, ux(cx)) + edgeY(EDGE_BOT, ux(cx)))/2);
+    out.push({cx, top, bot, mid, rows:Math.max(0, Math.floor((bot-top+gap)/(d+gap)))});
+  }
+  return out;
+}
+function bandCapacity(cols){ return cols.reduce((a,c)=>a+c.rows, 0); }
+/* Spread n tokens evenly over the columns (by fill ratio) and centre each column vertically on
+   the funnel's midline. Returns top-left positions in column order. */
+function placeInColumns(cols, n, d, gap){
+  const k = cols.map(()=>0);
+  for(let t=0; t<n; t++){
+    let best = -1, bestF = Infinity;
+    cols.forEach((c,ci)=>{ if(k[ci]<c.rows){ const f = (k[ci]+1)/c.rows; if(f < bestF-1e-9){ bestF = f; best = ci; } } });
+    if(best<0) break;
+    k[best]++;
+  }
+  const pos = [];
+  cols.forEach((c,ci)=>{
+    const bh = k[ci]*(d+gap)-gap;
+    const y0 = Math.max(c.top, Math.min(c.mid-bh/2, c.bot-bh));
+    for(let r=0; r<k[ci]; r++) pos.push({x:c.cx-d/2, y:y0+r*(d+gap)});
+  });
+  return pos;
+}
+function fitBandDiameter(bands, splits, W, H, dMax, dMin, step, gap, padX, padY){
+  for(let d=dMax; d>=dMin-1e-9; d-=step){
+    if(bands.every((list,i)=>!list.length || bandCapacity(bandColumns(i, splits, W, H, d, gap, padX, padY))>=list.length)) return d;
+  }
+  return dMin;
 }
 
 function renderFunnelTab(){
@@ -1892,12 +1969,15 @@ function renderFunnelTab(){
   html += `<div class="funnel-stats">${[['Projects',items.length],['Active in funnel',inFunnel],['On hold / stopped',g.onHold.length+g.stopped.length],['Archived',g.archived.length]].map(s=>`<div class="fstat"><b>${s[1]}</b><small>${s[0]}</small></div>`).join('')}</div>`;
 
   const legendCats = Array.from(new Set(items.map(x=>catInfo(x.p.classification).label))).map(l=>catInfo(l==='Unclassified'?'':l));
+  /* Every band must be wide enough for at least one token at minimum size — on a phone that is a
+     much larger share of the funnel than on a desktop screen. */
+  const cont = document.getElementById('container'), cs = getComputedStyle(cont);
+  const estW = Math.max(200, (cont.clientWidth || 1000) - parseFloat(cs.paddingLeft||0) - parseFloat(cs.paddingRight||0) - 34);
+  const minBand = Math.max(FUNNEL_MIN_BAND, (FTOK_MIN + 2*FTOK_PAD_X + 8)/estW*FUNNEL_W);
+  const layout = currentFunnelLayout = funnelLayout(g.bands.map(b=>b.length), minBand);
   html += `<div class="funnel-capture" id="funnelCapture">
-    <div class="funnel-lbls">${STATUS_ORDER.map((s,i)=>`<div style="left:${FUNNEL_BOUNDS[i].left}%;width:${FUNNEL_BOUNDS[i].width}%">${s}</div>`).join('')}</div>
-    <div class="funnel-canvas" id="funnelCanvas">${funnelSvg()}${STATUS_ORDER.map((s,i)=>{
-      const b = FUNNEL_BOUNDS[i];
-      return `<div class="fstage" style="left:${b.left}%;top:${b.top}%;width:${b.width}%;height:${b.height}%"><div class="fstage-inner">${g.bands[i].length ? g.bands[i].map(x=>ftokHtml(x)).join('') : '<span class="fempty">–</span>'}</div></div>`;
-    }).join('')}</div>
+    <div class="funnel-lbls">${STATUS_ORDER.map((s,i)=>`<div style="left:${layout.bounds[i].left}%;width:${layout.bounds[i].width}%" title="${s} · ${g.bands[i].length}">${s} <span>${g.bands[i].length}</span></div>`).join('')}</div>
+    <div class="funnel-canvas" id="funnelCanvas">${funnelSvg(layout.splits)}<div class="ftok-layer">${g.bands.map((list,i)=>list.map(x=>ftokHtml(x,'',i)).join('')).join('')}</div></div>
     <div class="funnel-side">${[['On hold',g.onHold,'gray'],['Stopped',g.stopped,'gray'],['Archived',g.archived,'dark']].map(([label,list,tone])=>`<div class="fside"><h4>${label}</h4><div class="fside-wrap">${list.length ? list.map(x=>ftokHtml(x,tone)).join('') : '<span class="fempty">–</span>'}</div></div>`).join('')}</div>
     ${legendCats.length ? `<div class="funnel-legend"><b>Classification</b>${legendCats.map(ci=>`<span><i class="catdot" style="background:${ci.bg};color:${ci.fg}">${escapeHtml(ci.code)}</i>${escapeHtml(ci.label)}</span>`).join('')}</div>` : ''}
   </div>`;
@@ -1908,15 +1988,12 @@ function renderFunnelTab(){
   document.getElementById('funnelPptxBtn').addEventListener('click', e=>runExport(e.currentTarget, exportFunnelPptx));
   document.getElementById('funnelPdfBtn').addEventListener('click', e=>runExport(e.currentTarget, exportFunnelPdf));
   document.querySelectorAll('.ftok[data-fid]').forEach(el=>el.addEventListener('click', ()=>openFunnelDetail(el.getAttribute('data-fid'))));
-  requestAnimationFrame(()=>{
-    fitFunnelTokens(g);
-    document.querySelectorAll('#funnelCanvas .fstage-inner').forEach(el=>trimFunnelOverflow(el));
-  });
+  requestAnimationFrame(()=>layoutFunnelTokens(g));
 }
 
 /* Token size adapts to the project count: the largest diameter at which every band still fits
    its projects, taken over all bands so all tokens stay the same size. */
-const FTOK_MAX = 88, FTOK_MIN = 34, FTOK_GAP = 6;
+const FTOK_MAX = 92, FTOK_MIN = 38, FTOK_GAP = 6;
 function fitDiameter(w, h, n){
   if(n<=0) return FTOK_MAX;
   for(let d=FTOK_MAX; d>=FTOK_MIN; d--){
@@ -1925,39 +2002,54 @@ function fitDiameter(w, h, n){
   }
   return FTOK_MIN;
 }
-function fitFunnelTokens(g){
+const FTOK_PAD_X = 4, FTOK_PAD_Y = 5;
+function layoutFunnelTokens(g){
   const canvas = document.getElementById('funnelCanvas');
   const cap = document.getElementById('funnelCapture');
   if(!canvas || !cap || !canvas.clientWidth) return;
-  let d = FTOK_MAX;
-  STATUS_ORDER.forEach((s,i)=>{
-    const b = FUNNEL_BOUNDS[i];
-    d = Math.min(d, fitDiameter(canvas.clientWidth*b.width/100-10, canvas.clientHeight*b.height/100-8, g.bands[i].length));
-  });
+  const W = canvas.clientWidth, H = canvas.clientHeight, splits = currentFunnelLayout.splits;
+  let d = fitBandDiameter(g.bands, splits, W, H, FTOK_MAX, FTOK_MIN, 1, FTOK_GAP, FTOK_PAD_X, FTOK_PAD_Y);
   cap.querySelectorAll('.fside-wrap').forEach(el=>{
     const n = el.querySelectorAll('.ftok').length;
     if(n) d = Math.min(d, fitDiameter(el.clientWidth-4, FTOK_MAX*2, n));
   });
+  /* Text never spills out of a token: as many lines as fit, the rest ends in "…" (full title
+     in the tooltip). */
+  const font = Math.max(8, Math.min(11.5, d*0.15)), pad = Math.max(4, Math.round(d*0.09));
   const st = cap.style;
   st.setProperty('--ftokD', d+'px');
-  st.setProperty('--ftokF', Math.max(6.5, Math.min(10.5, d*0.118)).toFixed(1)+'px');
-  st.setProperty('--ftokP', Math.max(3, Math.round(d*0.10))+'px');
+  st.setProperty('--ftokF', font.toFixed(1)+'px');
+  st.setProperty('--ftokP', pad+'px');
+  st.setProperty('--ftokLines', Math.max(2, Math.floor((d-2*pad)/(font*1.15))));
   st.setProperty('--fbadgeD', Math.max(14, Math.round(d*0.26))+'px');
   st.setProperty('--fbadgeF', Math.max(6.5, d*0.105).toFixed(1)+'px');
-}
-/* If a band still can't show everything at the minimum size, the tail becomes one "+N" token
-   so nothing is silently cut off. */
-function trimFunnelOverflow(el){
-  let hidden = 0, guard = 0;
-  while(el.scrollHeight > el.clientHeight+2 && el.querySelectorAll('.ftok').length>1 && guard++<200){
-    el.querySelector('.ftok:last-of-type').remove();
-    hidden++;
-  }
-  if(hidden>0){
-    const last = el.querySelector('.ftok:last-of-type');
-    if(last) last.remove();
-    el.insertAdjacentHTML('beforeend', `<div class="ftok more" title="${hidden+1} more projects">+${hidden+1}</div>`);
-  }
+
+  const layer = canvas.querySelector('.ftok-layer');
+  layer.querySelectorAll('.ftok.more, .fempty').forEach(e=>e.remove());
+  g.bands.forEach((list,i)=>{
+    if(!list.length){
+      const xm = (splits[i]+splits[i+1])/2;
+      layer.insertAdjacentHTML('beforeend', `<span class="fempty" style="left:${xm*W/FUNNEL_W}px;top:${(edgeY(EDGE_TOP,xm)+edgeY(EDGE_BOT,xm))/2*H/FUNNEL_H}px">–</span>`);
+      return;
+    }
+    const els = [...layer.querySelectorAll(`.ftok[data-band="${i}"]`)];
+    const cols = bandColumns(i, splits, W, H, d, FTOK_GAP, FTOK_PAD_X, FTOK_PAD_Y);
+    const capacity = bandCapacity(cols);
+    if(!capacity){
+      els.forEach(el=>el.style.display = 'none');
+      const xm = (splits[i]+splits[i+1])/2;
+      layer.insertAdjacentHTML('beforeend', `<div class="ftok more" style="left:${xm*W/FUNNEL_W-d/2}px;top:${(edgeY(EDGE_TOP,xm)+edgeY(EDGE_BOT,xm))/2*H/FUNNEL_H-d/2}px;visibility:visible" title="${els.length} projects">+${els.length}</div>`);
+      return;
+    }
+    const shown = els.length>capacity ? Math.max(0, capacity-1) : els.length;
+    const plus = els.length - shown;
+    const pos = placeInColumns(cols, shown + (plus?1:0), d, FTOK_GAP);
+    els.forEach((el,k)=>{
+      if(k<shown){ el.style.left = pos[k].x+'px'; el.style.top = pos[k].y+'px'; el.style.visibility = 'visible'; }
+      else el.style.display = 'none';
+    });
+    if(plus && pos[shown]) layer.insertAdjacentHTML('beforeend', `<div class="ftok more" style="left:${pos[shown].x}px;top:${pos[shown].y}px;visibility:visible" title="${plus} more projects">+${plus}</div>`);
+  });
 }
 window.addEventListener('resize', ()=>{
   clearTimeout(window._funnelResizeT);
@@ -2138,9 +2230,9 @@ function pptHeader(slide, title){
   slide.addText(String(title||''), {x:0.45, y:0.1, w:10.6, h:PPT_HEADER_H-0.2, fontSize:22, bold:true, color:'FFFFFF', valign:'middle', fit:'shrink'});
 }
 /* Native funnel band: the sampled polygon as a custom shape, points in EMU relative to its box. */
-function pptBand(slide, i, fx, fy, fw, fh){
-  const EMU = 914400, pts = bandPolygon(i, 14);
-  const x0 = FUNNEL_SPLITS[i], w = FUNNEL_SPLITS[i+1]-x0;
+function pptBand(slide, i, fx, fy, fw, fh, splits=FUNNEL_SPLITS){
+  const EMU = 914400, pts = bandPolygon(i, splits, 14);
+  const x0 = splits[i], w = splits[i+1]-x0;
   const shapeX = fx+fw*(x0/FUNNEL_W), shapeW = fw*(w/FUNNEL_W);
   const ys = pts.map(p=>p[1]), yMin = Math.min(...ys), yMax = Math.max(...ys);
   const shapeY = fy+fh*(yMin/FUNNEL_H), shapeH = fh*((yMax-yMin)/FUNNEL_H);
@@ -2248,26 +2340,44 @@ function pptCircles(slide, items, x, y, w, style, availH){
     for(let col=0; col<rowCount; col++){
       const idx = rowStart+col;
       const cx = rowX+col*(d+gap)+d/2, cy = startY+row*(d+gap)+d/2;
-      if(idx<shown.length){
-        const it = shown[idx], ci = catInfo(it.p.classification);
-        const fill = style==='gray' ? 'CFCFC6' : style==='dark' ? '0B3948' : 'FFFFFF';
-        const txt = style==='dark' ? 'FFFFFF' : '0B3948';
-        slide.addShape('teardrop', {x:cx-d/2, y:cy-d/2, w:d, h:d, rotate:270, fill:{color:fill}, line:style?{type:'none'}:{color:'D6E4E4', width:.5}});
-        const ft = pptFitCircleText(it.title, d);
-        slide.addText(ft.text, {x:cx-d/2+0.04, y:cy-d/2+0.04, w:d-0.08, h:d-0.08, fontSize:ft.size, align:'center', valign:'middle', color:txt, wrap:false, lineSpacingMultiple:0.96});
-        if(!style){
-          const bd = Math.max(0.15, Math.min(0.22, d*0.28));
-          slide.addShape('ellipse', {x:cx+d/2-bd*0.85, y:cy+d/2-bd*0.85, w:bd, h:bd, fill:{color:ci.bgHex}, line:{color:'FFFFFF', width:1}});
-          slide.addText(ci.code, {x:cx+d/2-bd*0.85, y:cy+d/2-bd*0.85, w:bd, h:bd, fontSize:Math.max(5, Math.min(7.5, bd*33)), bold:true, align:'center', valign:'middle', color:ci.fgHex, wrap:false});
-        }
-      }else{
-        const fill = style==='gray' ? 'CFCFC6' : style==='dark' ? '0B3948' : 'E4F0EF';
-        slide.addShape('teardrop', {x:cx-d/2, y:cy-d/2, w:d, h:d, rotate:270, fill:{color:fill}, line:{color:'A8C7D2', width:.75}});
-        slide.addText('+'+plus, {x:cx-d/2, y:cy-d/2, w:d, h:d, fontSize:9, bold:true, align:'center', valign:'middle', color:style==='dark'?'FFFFFF':'0B3948'});
-      }
+      if(idx<shown.length) pptToken(slide, shown[idx], cx, cy, d, style);
+      else pptPlus(slide, plus, cx, cy, d, style);
     }
   }
   return neededH;
+}
+function pptToken(slide, it, cx, cy, d, style){
+  const ci = catInfo(it.p.classification);
+  const fill = style==='gray' ? 'CFCFC6' : style==='dark' ? '0B3948' : 'FFFFFF';
+  const txt = style==='dark' ? 'FFFFFF' : '0B3948';
+  slide.addShape('teardrop', {x:cx-d/2, y:cy-d/2, w:d, h:d, rotate:270, fill:{color:fill}, line:style?{type:'none'}:{color:'D6E4E4', width:.5}});
+  const ft = pptFitCircleText(it.title, d);
+  slide.addText(ft.text, {x:cx-d/2+0.04, y:cy-d/2+0.04, w:d-0.08, h:d-0.08, fontSize:ft.size, align:'center', valign:'middle', color:txt, wrap:false, lineSpacingMultiple:0.96});
+  if(!style){
+    const bd = Math.max(0.15, Math.min(0.22, d*0.28));
+    slide.addShape('ellipse', {x:cx+d/2-bd*0.85, y:cy+d/2-bd*0.85, w:bd, h:bd, fill:{color:ci.bgHex}, line:{color:'FFFFFF', width:1}});
+    slide.addText(ci.code, {x:cx+d/2-bd*0.85, y:cy+d/2-bd*0.85, w:bd, h:bd, fontSize:Math.max(5, Math.min(7.5, bd*33)), bold:true, align:'center', valign:'middle', color:ci.fgHex, wrap:false});
+  }
+}
+function pptPlus(slide, plus, cx, cy, d, style){
+  const fill = style==='gray' ? 'CFCFC6' : style==='dark' ? '0B3948' : 'E4F0EF';
+  slide.addShape('teardrop', {x:cx-d/2, y:cy-d/2, w:d, h:d, rotate:270, fill:{color:fill}, line:{color:'A8C7D2', width:.75}});
+  slide.addText('+'+plus, {x:cx-d/2, y:cy-d/2, w:d, h:d, fontSize:9, bold:true, align:'center', valign:'middle', color:style==='dark'?'FFFFFF':'0B3948'});
+}
+/* Funnel bands on the slide use the same column layout as the screen. */
+const PPT_PAD_X = 0.07, PPT_PAD_Y = 0.06;
+function pptBandTokens(slide, list, i, splits, fx, fy, fw, fh){
+  const d = PPT_CIRCLE_D, gap = PPT_CIRCLE_GAP;
+  const cols = bandColumns(i, splits, fw, fh, d, gap, PPT_PAD_X, PPT_PAD_Y);
+  const capacity = bandCapacity(cols);
+  const shown = list.length>capacity ? Math.max(0, capacity-1) : list.length;
+  const plus = list.length - shown;
+  const pos = placeInColumns(cols, shown+(plus?1:0), d, gap);
+  pos.forEach((p,k)=>{
+    const cx = fx+p.x+d/2, cy = fy+p.y+d/2;
+    if(k<shown) pptToken(slide, list[k], cx, cy, d, null);
+    else pptPlus(slide, plus, cx, cy, d, null);
+  });
 }
 function pptPlanLegend(items, legW){
   const cats = Array.from(new Set(items.map(x=>catInfo(x.p.classification).label))).map(l=>catInfo(l==='Unclassified'?'':l));
@@ -2301,17 +2411,18 @@ function pptOverviewSlide(pptx, g){
   const boxW = 4.05, boxGap = 0.14, boxPadTop = 0.17, boxPadBottom = 0.04;
   const boxGroups = [['On hold',g.onHold,'gray'],['Stopped',g.stopped,'gray'],['Archived',g.archived,'dark']];
   const fhGuess = Math.max(2.4, SLIDE_H-0.28-fy-0.16-1.0-0.14-legendPlan.h);
+  const layout = funnelLayout(g.bands.map(b=>b.length));
   PPT_CIRCLE_D = Math.min(
-    ...STATUS_ORDER.map((s,i)=>pptFitCircleD(fw*(FUNNEL_BOUNDS[i].width/100)-0.28, fhGuess*(FUNNEL_BOUNDS[i].height/100)-0.2, g.bands[i].length)),
+    Math.round(fitBandDiameter(g.bands, layout.splits, fw, fhGuess, PPT_CIRCLE_MAX, PPT_CIRCLE_MIN, 0.01, PPT_CIRCLE_GAP, PPT_PAD_X, PPT_PAD_Y)*100)/100,
     ...boxGroups.map(([,list])=>list.length ? pptFitCircleD(boxW-0.2, 1.5, list.length) : PPT_CIRCLE_MAX)
   );
   const boxH = Math.max(0.44, ...boxGroups.map(([,list])=>list.length ? boxPadTop+pptCircleRows(list.length, boxW-0.2)*(PPT_CIRCLE_D+PPT_CIRCLE_GAP)-PPT_CIRCLE_GAP+boxPadBottom : boxPadTop+0.08));
   const fh = Math.max(2.4, SLIDE_H-0.28-fy-0.16-boxH-0.14-legendPlan.h);
   STATUS_ORDER.forEach((s,i)=>{
-    const b = FUNNEL_BOUNDS[i];
-    slide.addText(s, {x:fx+fw*(b.left/100)+0.05, y:fy-0.3, w:fw*(b.width/100)-0.1, h:0.24, fontSize:12, bold:true, color:'0B3948'});
-    pptBand(slide, i, fx, fy, fw, fh);
-    pptCircles(slide, g.bands[i], fx+fw*(b.left/100)+0.14, fy+fh*(b.top/100)+0.1, fw*(b.width/100)-0.28, null, fh*(b.height/100)-0.2);
+    const b = layout.bounds[i];
+    slide.addText(s, {x:fx+fw*(b.left/100)+0.05, y:fy-0.3, w:fw*(b.width/100)-0.1, h:0.24, fontSize:12, bold:true, color:'0B3948', fit:'shrink'});
+    pptBand(slide, i, fx, fy, fw, fh, layout.splits);
+    pptBandTokens(slide, g.bands[i], i, layout.splits, fx, fy, fw, fh);
   });
   const boxY = fy+fh+0.16;
   boxGroups.forEach(([label,list,style],i)=>{
