@@ -295,6 +295,81 @@ footer button{background:none;border:none;color:var(--ink-soft);text-decoration:
   .section-title{flex-direction:column;align-items:flex-start;gap:2px;}
   .nav button{font-size:12px;padding:9px 12px;}
 }
+
+/* ---------- Funnel ---------- */
+.funnel-toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px;}
+.funnel-scope{display:flex;gap:8px;flex-wrap:wrap;}
+.funnel-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+.funnel-actions select{border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;background:var(--white);color:var(--ink);}
+.fbtn{border:1px solid var(--line);background:var(--white);border-radius:8px;padding:8px 14px;font-weight:600;font-size:13px;cursor:pointer;color:var(--teal-900);font-family:'Inter',sans-serif;}
+.fbtn:hover{background:var(--paper-dim);}
+.fbtn[disabled]{opacity:.55;cursor:progress;}
+.funnel-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:18px;}
+.fstat{background:var(--white);border:1px solid var(--line);border-radius:12px;padding:12px 16px;}
+.fstat b{display:block;font-family:'Fraunces',serif;font-size:24px;font-weight:600;color:var(--teal-900);}
+.fstat small{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-soft);}
+.funnel-capture{background:var(--white);border:1px solid var(--line);border-radius:var(--radius);padding:16px;}
+.funnel-lbls{position:relative;height:22px;margin-bottom:4px;}
+.funnel-lbls div{position:absolute;top:0;font-size:13px;font-weight:700;color:var(--teal-900);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.funnel-canvas{position:relative;width:100%;aspect-ratio:1000/420;}
+.funnel-canvas svg{position:absolute;inset:0;width:100%;height:100%;display:block;}
+.fstage{position:absolute;}
+.fstage-inner{position:absolute;inset:0;padding:4px;overflow:hidden;display:flex;flex-wrap:wrap;align-content:center;justify-content:center;align-items:center;gap:6px;}
+.ftok{width:var(--ftokD,80px);height:var(--ftokD,80px);border-radius:0 50% 50% 50%;background:#fff;display:flex;align-items:center;justify-content:center;text-align:center;font-size:var(--ftokF,10px);line-height:1.18;padding:var(--ftokP,8px);overflow-wrap:anywhere;hyphens:auto;color:var(--teal-900);font-weight:600;position:relative;box-shadow:0 2px 6px rgba(0,0,0,.18);flex:0 0 auto;cursor:pointer;}
+.ftok:hover{outline:2px solid var(--yellow-400);outline-offset:1px;}
+.ftok.gray{background:#cfcfc6;}
+.ftok.dark{background:var(--teal-900);color:#fff;}
+.ftok.more{cursor:default;font-size:12px;background:#e4f0ef;}
+.ftok.more:hover{outline:none;}
+.fbadge{position:absolute;bottom:-2px;right:-2px;width:var(--fbadgeD,20px);height:var(--fbadgeD,20px);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:var(--fbadgeF,8px);font-weight:700;box-shadow:0 0 0 2px #fff;line-height:1;}
+.fempty{color:rgba(255,255,255,.65);font-size:11px;}
+.funnel-side{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:14px;}
+.fside{border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--paper);}
+.fside h4{margin:0 0 8px;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft);font-weight:500;}
+.fside-wrap{display:flex;flex-wrap:wrap;gap:6px;}
+.fside .fempty{color:var(--ink-soft);}
+.funnel-legend{display:flex;gap:14px;flex-wrap:wrap;align-items:center;margin-top:12px;font-size:12px;color:var(--ink);}
+.funnel-legend b{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft);font-weight:500;}
+.funnel-legend span{display:inline-flex;align-items:center;gap:6px;}
+.catdot{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:0 50% 50% 50%;font-size:8px;font-weight:700;font-style:normal;flex-shrink:0;}
+.fd-overlay{position:fixed;inset:0;background:rgba(11,34,41,.6);z-index:900;display:flex;align-items:flex-start;justify-content:center;padding:32px 16px;overflow-y:auto;}
+.fd-sheet{background:var(--white);border-radius:14px;max-width:980px;width:100%;overflow:hidden;box-shadow:0 20px 50px rgba(0,0,0,.3);}
+.fd-head{background-color:var(--teal-900);background-size:cover;background-position:center;display:flex;justify-content:space-between;align-items:center;gap:16px;padding:20px 24px;}
+.fd-head h2{font-size:22px;color:#fff;}
+.fd-head img{height:22px;flex-shrink:0;}
+.fd-sub{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;padding:14px 24px 0;font-size:13px;color:var(--ink-soft);}
+.fd-chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:999px;padding:3px 10px 3px 4px;color:var(--ink);background:var(--paper);}
+.fd-pipe{display:flex;gap:4px;padding:12px 24px;flex-wrap:wrap;}
+.fd-pipe span{flex:1;min-width:84px;text-align:center;font-size:11px;padding:6px 4px;border-radius:6px;background:#eef4f4;color:var(--ink-soft);}
+.fd-pipe span.on{font-weight:700;}
+.fd-grid{display:grid;grid-template-columns:1.35fr 1fr;gap:12px;padding:0 24px 18px;}
+.fd-col{display:flex;flex-direction:column;gap:10px;}
+.fd-box{border:1px solid var(--line);border-left-width:4px;border-radius:9px;padding:10px 14px;background:#fbfcfd;}
+.fd-box h4{margin:0 0 4px;font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--teal-900);font-weight:500;}
+.fd-box p{margin:0;font-size:13px;line-height:1.5;white-space:pre-wrap;color:var(--ink);}
+.fd-nav{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;padding:12px 24px 16px;border-top:1px solid var(--line);}
+.fd-foot{height:8px;background-size:cover;background-position:center;}
+.pdetails{margin-top:10px;border:1px dashed var(--line);border-radius:8px;padding:7px 10px;background:var(--white);}
+.pdetails summary{cursor:pointer;font-size:12px;font-weight:600;color:var(--teal-700);display:flex;justify-content:space-between;gap:8px;align-items:center;list-style:none;}
+.pdetails summary::-webkit-details-marker{display:none;}
+.pdetails summary > span:first-child::before{content:'▸ ';}
+.pdetails[open] summary > span:first-child::before{content:'▾ ';}
+.pd-meta{font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:400;color:var(--ink-soft);display:inline-flex;align-items:center;gap:6px;}
+.pd-meta .catdot{width:16px;height:16px;font-size:7px;}
+.pd-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 10px;margin-top:10px;padding-bottom:4px;}
+.pd-field{display:flex;flex-direction:column;gap:3px;font-size:10.5px;color:var(--ink-soft);font-family:'IBM Plex Mono',monospace;}
+.pd-field.pd-wide{grid-column:1 / -1;}
+.pd-field input,.pdetails .pd-field textarea{font-family:'Inter',sans-serif;font-size:13px;border:1px solid var(--line);border-radius:7px;padding:6px 9px;color:var(--ink);background:var(--white);margin:0;width:100%;}
+.pdetails .pd-field textarea{min-height:40px;resize:vertical;}
+@media (max-width:700px){
+  .funnel-stats{grid-template-columns:repeat(2,minmax(0,1fr));}
+  .funnel-canvas{aspect-ratio:auto;height:620px;}
+  .funnel-lbls div{font-size:9.5px;}
+  .funnel-side{grid-template-columns:1fr;}
+  .fd-grid{grid-template-columns:1fr;}
+  .fd-overlay{padding:12px 8px;}
+  .pd-grid{grid-template-columns:1fr;}
+}
 </style>
 </head>
 <body>
@@ -323,6 +398,7 @@ footer button{background:none;border:none;color:var(--ink-soft);text-decoration:
 <div class="nav-wrap">
   <div class="nav" id="mainNav">
     <button data-tab="dashboard" class="active">Dashboard</button>
+    <button data-tab="funnel">Funnel</button>
     <button data-tab="prep">Prep</button>
     <button data-tab="exchange">Exchange Mode</button>
     <button data-tab="tasks">Follow-up Tasks</button>
@@ -363,11 +439,63 @@ const STATUS_COLOR = {
   'On Hold':'var(--hold)','Stopped':'var(--stopped)'
 };
 const STATUS_DARK_TEXT = {'Incubation':true,'Scalability':true,'On Hold':true};
+/* Hex values of the stage colours above, for places that can't use CSS vars (SVG fills, slides). */
+const STAGE_HEX = {'Idea':'0B3948','Exploration':'1C8E85','In-Progress':'4FA567','Incubation':'93C94A','Scalability':'D7DE1F','On Hold':'B5B199','Stopped':'6D6A5E'};
+
+/* Optional structured project details — shown in the funnel detail sheet and on the
+   PowerPoint detail slides. Notes stay free text next to them. */
+const DETAIL_FIELDS = [
+  {key:'classification', label:'Classification', type:'input'},
+  {key:'problem',   label:'Problem / starting point', type:'textarea'},
+  {key:'benefit',   label:'Goal / benefit',           type:'textarea'},
+  {key:'nextSteps', label:'Next steps / remarks',     type:'textarea'},
+  {key:'team',      label:'Team members involved',    type:'input'},
+  {key:'partners',  label:'External partners',        type:'input'}
+];
+/* Classification codes and colours match the BUZ "MLF Total Funnel" tool; new names get a
+   code from their initials and a stable colour from the extra palette (same name, same colour). */
+const KNOWN_CATS = [
+  ['R','Robotics','0F9B90','FFFFFF'],
+  ['AR','AR Guided work','E6003C','FFFFFF'],
+  ['AI','AI','E6E008','08324B'],
+  ['D','Digital Twin / Simulation','08324B','FFFFFF'],
+  ['T','Technology / Automation','FF9B32','FFFFFF'],
+  ['BI','Business Intelligence','007BB8','FFFFFF'],
+  ['VE','Value Enhancement','6B4E9B','FFFFFF'],
+  ['AU','Automation','C6007E','FFFFFF'],
+  ['DQ','Data Quality','3C6E9F','FFFFFF']
+];
+const EXTRA_CAT_COLORS = [['00857C','FFFFFF'],['A85B00','FFFFFF'],['8A94A6','FFFFFF'],['B8CE00','08324B'],['00A0DC','FFFFFF'],['5B7F2B','FFFFFF'],['9E2A2B','FFFFFF'],['2E4A62','FFFFFF']];
+function catInfo(raw){
+  const s = (raw||'').trim();
+  const mk = (code,label,bg,fg)=>({code, label, bgHex:bg, fgHex:fg, bg:'#'+bg, fg:'#'+fg});
+  const found = KNOWN_CATS.find(c=>c[0].toLowerCase()===s.toLowerCase() || c[1].toLowerCase()===s.toLowerCase());
+  if(found) return mk(found[0], found[1], found[2], found[3]);
+  if(!s) return mk('–', 'Unclassified', '8A94A6', 'FFFFFF');
+  const words = s.split(/[\s\/\-_,.]+/).filter(Boolean);
+  const clean = (s.match(/[A-Za-zÄÖÜäöü0-9]/g)||[]).join('');
+  const taken = KNOWN_CATS.map(c=>c[0].toUpperCase());
+  const cand = [];
+  if(words.length>1) cand.push(words.slice(0,2).map(w=>w[0]).join(''));
+  cand.push(clean.slice(0,2), clean.slice(0,3), clean[0]+clean.slice(-1), clean.slice(0,1)+clean.slice(2,4));
+  const code = cand.map(c=>(c||'').toUpperCase()).find(c=>c.length>=2 && !taken.includes(c)) || clean.slice(0,2).toUpperCase() || '?';
+  let h = 0; for(let i=0;i<s.length;i++) h = (h*31 + s.charCodeAt(i))>>>0;
+  const p = EXTRA_CAT_COLORS[h % EXTRA_CAT_COLORS.length];
+  return mk(code, s, p[0], p[1]);
+}
+function classificationOptions(){
+  const set = new Set(KNOWN_CATS.map(c=>c[1]));
+  if(DATA){
+    DATA.regions.forEach(r=>r.projects.forEach(p=>{ if(p.classification) set.add(catInfo(p.classification).label); }));
+    DATA.global.projects.forEach(p=>{ if(p.classification) set.add(catInfo(p.classification).label); });
+  }
+  return Array.from(set);
+}
 function statusTextStyle(status){ return STATUS_DARK_TEXT[status] ? 'color:var(--ink);' : ''; }
 
 function uid(prefix){return prefix+'-'+Math.random().toString(36).slice(2,9);}
 
-const SEED_DATA = {"regions":[{"id":"eur","code":"EUR","name":"Europe","lead":"Fabio Saxer","note":"","projects":[{"id":"p-2o5i1ct","name":"Machine connectivity with ITENS in BZAM","lead":"","status":"In-Progress","notes":"","tasks":[],"archived":false,"hasImage":false},{"id":"p-13phaar","name":"Employee enablement in BZAM, BUZ and BHWL","lead":"","status":"Exploration","notes":"","tasks":[],"archived":false,"hasImage":false}],"log":[]},{"id":"buz","code":"BUZ","name":"BUZ","lead":"Roman Heuberger","note":"","projects":[{"id":"p-e250o10","name":"Evaluation of OEE software and machine connectivity","lead":"Fabio Keller","status":"Exploration","notes":"","tasks":[],"archived":false,"hasImage":false},{"id":"p-2r1b87o","name":"Evaluation of maintenance software","lead":"Fabio Saxer","status":"Exploration","notes":"","tasks":[],"archived":false,"hasImage":false},{"id":"p-uuvm0u3","name":"Druckluft","lead":"","status":"Idea","notes":"Zusammen mit der Uze","tasks":[],"archived":false,"hasImage":false},{"id":"p-2dv61wa","name":"Track and Trace","lead":"","status":"On Hold","notes":"","tasks":[],"archived":false,"hasImage":false},{"id":"p-vjq71dq","name":"Time Study with Fraunhofer","lead":"Pascal Wälli","status":"Idea","notes":"","tasks":[],"archived":false,"hasImage":false},{"id":"p-lsy37e7","name":"Coating Robotic","lead":"","status":"Idea","notes":"","tasks":[],"archived":false,"hasImage":false},{"id":"p-4r21w3h","name":"Lehrlingsausbildung","lead":"","status":"Idea","notes":"Weiterentwicklung (Digitales) Andon\nZustandserfassung der Vorbehandlungsbäder\nDigitale Nachricht bei Türöffnung vom Trockner\nReal Time Maschinenzustand auf dem Shopfloor\n","tasks":[],"archived":false,"hasImage":false}],"log":[]},{"id":"gcr","code":"GCR","name":"Greater China Region","lead":"Yan Chen","note":"","projects":[{"id":"p-q79s59c","name":"Lighthouse","lead":"","status":"Exploration","notes":"Zoomlion or CMCU\nPartner evaluation pending for August\nAGVs\nDigital Twin","tasks":[],"archived":false,"hasImage":false},{"id":"p-tawxqcc","name":"Smart inspection","lead":"","status":"Exploration","notes":"Sheet metal\nAssembly\nelectronic installation","tasks":[],"archived":false,"hasImage":false},{"id":"p-rkezyf9","name":"Agentic AIs","lead":"","status":"Exploration","notes":"routing based on 3D drawing -- cost estemation\nCNC part - 98% accuracy\nAssembly with SOP - accuracy pending","tasks":[],"archived":false,"hasImage":false},{"id":"p-fh79tme","name":"Robotics","lead":"","status":"Exploration","notes":"iSage (integrator), Estun (producer) and many more : )\nShanghai AI institute - potential soultion for BCHA","tasks":[],"archived":false,"hasImage":false},{"id":"p-9zeb37s","name":"SmartMeters","lead":"","status":"Incubation","notes":"","tasks":[],"archived":false,"hasImage":false}],"log":[]},{"id":"mai","code":"MAI","name":"Middle East, Africa, India","lead":"Sudhir Punyamurthula","note":"","projects":[{"id":"p-mai001","name":"Slot Planning","lead":"","status":"Incubation","notes":"IP Area: Planning, IE and PE\nCategory: Value Enhancement\nExternal Solution: Yes\nSupplier/Solution: Dhruv Technologies","tasks":[],"archived":false,"hasImage":false},{"id":"p-mai002","name":"Order Management","lead":"","status":"Idea","notes":"IP Area: Planning, IE and PE\nCategory: Value Enhancement\nExternal Solution: Yes\nSupplier/Solution: Dhruv Technologies","tasks":[],"archived":false,"hasImage":false},{"id":"p-mai003","name":"JDI + Production Tracking","lead":"","status":"Incubation","notes":"IP Area: Planning, IE and PE\nCategory: Value Enhancement\nExternal Solution: No\nSupplier/Solution: Buhler AI tools","tasks":[],"archived":false,"hasImage":false},{"id":"p-mai004","name":"MES + Order Predictability","lead":"","status":"Exploration","notes":"IP Area: Planning, IE and PE\nCategory: Value Enhancement\nExternal Solution: No\nSupplier/Solution: ITP (SAP DM)","tasks":[],"archived":false,"hasImage":false},{"id":"p-mai005","name":"Order Processing","lead":"","status":"Incubation","notes":"IP Area: Planning, IE and PE\nCategory: Automation\nExternal Solution: No\nSupplier/Solution: MLS+ITP (RPA)","tasks":[],"archived":false,"hasImage":false},{"id":"p-mai006","name":"Master data and routings","lead":"","status":"Exploration","notes":"IP Area: Planning, IE and PE\nCategory: Automation\nExternal Solution: No\nSupplier/Solution: MLS+ITP (RPA+ Buhler AI tools)","tasks":[],"archived":false,"hasImage":false},{"id":"p-mai007","name":"MFT template - PLC","lead":"","status":"In-Progress","notes":"IP Area: Planning, IE and PE\nCategory: Data Quality\nExternal Solution: No\nSupplier/Solution: MLS+ITP (RPA+ Buhler AI tools)","tasks":[],"archived":false,"hasImage":false},{"id":"p-mai008","name":"MRP parameters adjustment","lead":"","status":"Incubation","notes":"IP Area: Planning, IE and PE\nCategory: Data Quality\nExternal Solution: No\nSupplier/Solution: MLS+ITP (RPA)","tasks":[],"archived":false,"hasImage":false},{"id":"p-mai009","name":"ECN management","lead":"","status":"In-Progress","notes":"IP Area: Planning, IE and PE\nCategory: Data Quality\nExternal Solution: No\nSupplier/Solution: MLS+ITP (RPA)","tasks":[],"archived":false,"hasImage":false},{"id":"p-mai010","name":"WMS: Material Traceability, Alerts, Analytics","lead":"","status":"Idea","notes":"IP Area: Logistics\nCategory: Value Enhancement\nExternal Solution: Combined\nSupplier/Solution: EWM, CMTI, Aumovio","tasks":[],"archived":false,"hasImage":false},{"id":"p-mai011","name":"Picking Optimization (SL opt+wave picking)","lead":"","status":"In-Progress","notes":"IP Area: Logistics\nCategory: Value Enhancement\nExternal Solution: No\nSupplier/Solution: MLS + ITP (EWM+physical opt)","tasks":[],"archived":false,"hasImage":false},{"id":"p-mai012","name":"Virtual Kitting","lead":"","status":"Idea","notes":"IP Area: Logistics\nCategory: Value Enhancement\nExternal Solution: No\nSupplier/Solution: MLS+ITP (RPA+ Buhler AI tools)","tasks":[],"archived":false,"hasImage":false},{"id":"p-mai013","name":"Binning intelligence (Dynamic storage location)","lead":"","status":"Exploration","notes":"IP Area: Logistics\nCategory: Automation\nExternal Solution: No\nSupplier/Solution: MLS + ITP (EWM+physical opt)","tasks":[],"archived":false,"hasImage":false},{"id":"p-mai014","name":"OT: AS/RS, Scanners, Pick/Put to light","lead":"","status":"In-Progress","notes":"IP Area: Logistics\nCategory: Automation\nExternal Solution: Yes\nSupplier/Solution: Craftsman Automation, zebronics etc.","tasks":[],"archived":false,"hasImage":false},{"id":"p-mai015","name":"Stock counting and ageing","lead":"","status":"Exploration","notes":"IP Area: Logistics\nCategory: Data Quality\nExternal Solution: Yes\nSupplier/Solution: Aumovio","tasks":[],"archived":false,"hasImage":false},{"id":"p-mai016","name":"Storage location sync","lead":"","status":"Idea","notes":"IP Area: Logistics\nCategory: Data Quality\nExternal Solution: No\nSupplier/Solution: MLS + ITP (EWM+physical opt)","tasks":[],"archived":false,"hasImage":false},{"id":"p-mai017","name":"Supplier Portal","lead":"","status":"Exploration","notes":"IP Area: SCM\nCategory: Value Enhancement\nExternal Solution: No\nSupplier/Solution: MLS + ITP (Buhler AI tools)","tasks":[],"archived":false,"hasImage":false},{"id":"p-mai018","name":"On demand mfg - localization","lead":"","status":"Exploration","notes":"IP Area: SCM\nCategory: Value Enhancement\nExternal Solution: Yes\nSupplier/Solution: Zetwerk, Terra 91, Custiv","tasks":[],"archived":false,"hasImage":false},{"id":"p-mai019","name":"Analytics - OTD, OTIF, Material coverage","lead":"","status":"In-Progress","notes":"IP Area: SCM\nCategory: Value Enhancement\nExternal Solution: No\nSupplier/Solution: MLS + ITP (SAC, Buhler AI tools)","tasks":[],"archived":false,"hasImage":false},{"id":"p-mai020","name":"Demand Forecasts/ Scheduling agreements","lead":"","status":"Exploration","notes":"IP Area: SCM\nCategory: Automation\nExternal Solution: No\nSupplier/Solution: MLS + ITP (SAP, Buhler AI tools)","tasks":[],"archived":false,"hasImage":false},{"id":"p-mai021","name":"PO admin work automation","lead":"","status":"In-Progress","notes":"IP Area: SCM\nCategory: Automation\nExternal Solution: No\nSupplier/Solution: MLS+ITP (RPA+ Buhler AI tools)","tasks":[],"archived":false,"hasImage":false},{"id":"p-mai022","name":"OC and Delivery reminders","lead":"","status":"Exploration","notes":"IP Area: SCM\nCategory: Automation\nExternal Solution: No\nSupplier/Solution: MLS+ITP (RPA+SAP+ Buhler AI tools)","tasks":[],"archived":false,"hasImage":false},{"id":"p-mai023","name":"Sourcing Manual and Spec comparison","lead":"","status":"Idea","notes":"IP Area: SCM\nCategory: Automation\nExternal Solution: No\nSupplier/Solution: MLS+ITP (RPA+SAP+ Buhler AI tools)","tasks":[],"archived":false,"hasImage":false},{"id":"p-mai024","name":"Inforecords & source list accuracy","lead":"","status":"In-Progress","notes":"IP Area: SCM\nCategory: Data Quality\nExternal Solution: No\nSupplier/Solution: MLS+ITP (RPA+ Buhler AI tools)","tasks":[],"archived":false,"hasImage":false},{"id":"p-mai025","name":"Procurement data cleanup (reservations, PRs, POs)","lead":"","status":"In-Progress","notes":"IP Area: SCM\nCategory: Data Quality\nExternal Solution: No\nSupplier/Solution: MLS+ITP (RPA+ Buhler AI tools)","tasks":[],"archived":false,"hasImage":false},{"id":"p-mai026","name":"Parts Clustering and source identification","lead":"","status":"Exploration","notes":"IP Area: SCM\nCategory: Data Quality\nExternal Solution: No\nSupplier/Solution: MLS+ITP (RPA+ Buhler AI tools)","tasks":[],"archived":false,"hasImage":false},{"id":"p-mai027","name":"PFMEA --> AI backed","lead":"","status":"Incubation","notes":"IP Area: Quality\nCategory: Value Enhancement\nExternal Solution: No\nSupplier/Solution: Qlaire","tasks":[],"archived":false,"hasImage":false},{"id":"p-mai028","name":"8D assistaince","lead":"","status":"Exploration","notes":"IP Area: Quality\nCategory: Value Enhancement\nExternal Solution: No\nSupplier/Solution: Qlaire","tasks":[],"archived":false,"hasImage":false},{"id":"p-mai029","name":"Automated/Assisted Inspection","lead":"","status":"Exploration","notes":"IP Area: Quality\nCategory: Automation\nExternal Solution: Yes\nSupplier/Solution: Rosh AI, ATQ Metro","tasks":[],"archived":false,"hasImage":false},{"id":"p-mai030","name":"Quality/CIP entry","lead":"","status":"Idea","notes":"IP Area: Quality\nCategory: Automation\nExternal Solution: No\nSupplier/Solution: MLS+ITP (RPA+ Buhler AI tools)","tasks":[],"archived":false,"hasImage":false},{"id":"p-mai031","name":"Cost Center budgeting and spend analytics","lead":"","status":"Idea","notes":"IP Area: Controlling\nCategory: Value Enhancement\nExternal Solution: TBD","tasks":[],"archived":false,"hasImage":false},{"id":"p-mai032","name":"Part Cost estimation","lead":"","status":"Exploration","notes":"IP Area: Controlling\nCategory: Value Enhancement\nExternal Solution: No\nSupplier/Solution: MLS+ITP (RPA+ Buhler AI tools)","tasks":[],"archived":false,"hasImage":false},{"id":"p-mai033","name":"Stock Plan","lead":"","status":"Scalability","notes":"IP Area: Controlling\nCategory: Value Enhancement\nExternal Solution: No\nSupplier/Solution: MLS+ITP (RPA+ Buhler AI tools)","tasks":[],"archived":false,"hasImage":false},{"id":"p-mai034","name":"MO variance analysis","lead":"","status":"Idea","notes":"IP Area: Controlling\nCategory: Automation\nExternal Solution: TBD","tasks":[],"archived":false,"hasImage":false},{"id":"p-mai035","name":"Order Closing","lead":"","status":"Idea","notes":"IP Area: Controlling\nCategory: Automation\nExternal Solution: TBD","tasks":[],"archived":false,"hasImage":false},{"id":"p-mai036","name":"AMR","lead":"","status":"Incubation","notes":"IP Area: Shopfloor\nCategory: Automation\nExternal Solution: Yes\nSupplier/Solution: M2NXT","tasks":[],"archived":false,"hasImage":false}],"log":[]},{"id":"ams","code":"AMS","name":"Americas","lead":"Lucia Manatschal","note":"","projects":[{"id":"p-akelt3z","name":"Machine connectivity with BySoft","lead":"","status":"Stopped","notes":"","tasks":[],"archived":true,"hasImage":false},{"id":"p-qiy8vge","name":"Implementation of ProPlant as maintenance software","lead":"Fabio Saxer","status":"In-Progress","notes":"","tasks":[],"archived":false,"hasImage":false},{"id":"p-53jmswn","name":"Roomz workplace transparency","lead":"","status":"On Hold","notes":"","tasks":[],"archived":false,"hasImage":false},{"id":"p-4r5t6to","name":"Robotics","lead":"","status":"Exploration","notes":"Problems with Firmwareupdate and Docking...\nDreame does not want to help us, since we bought it with an unautorised vendor","tasks":[],"archived":false,"hasImage":false}],"log":[]}],"global":{"lead":"Fabio Saxer","projects":[{"id":"p-eoc5toy","name":"REWO work instructions","lead":"Lucia Manatschal","status":"In-Progress","notes":"","tasks":[],"archived":false,"hasImage":false},{"id":"p-fs4y40p","name":"Digital twin & simulation with SimPlan","lead":"Jris Niedermann","status":"Exploration","notes":"BUZ - Walzenfertigung\n","tasks":[],"archived":false,"hasImage":false},{"id":"p-hqpk4oq","name":"AI support in cost estimation","lead":"","status":"Exploration","notes":"NAM - Collin: simple Promt\nNAM - Ben: Hardcoded Inventor estimation\nNAM - Lucia: AI Training for Welding symbols (Phyton)\nEUR - Karoline: AI Prompt more established and with Bühler Process Data behind.","tasks":[],"archived":false,"hasImage":false}],"log":[]},"prepItems":[{"id":"prep-ux9by6s","text":"Durckerformat","scope":"ams","done":true,"doneIn":[],"created":"2026-07-22"},{"id":"prep-mz7ipj2","text":"Falls Jris dabei: Rückmeldung Fabrizio Simplan","scope":"ams","done":true,"doneIn":[],"created":"2026-07-22"},{"id":"prep-xj7eio8","text":"Lehrlingsausbildung","scope":"buz","done":true,"doneIn":[],"created":"2026-07-22"},{"id":"prep-1sabjti","text":"Rewo newly with BCHA","scope":"gcr","done":true,"doneIn":[],"created":"2026-07-22"},{"id":"prep-859bo4y","text":"https://www.filics.eu/en","scope":"buz","done":false,"doneIn":[],"created":"2026-07-23"},{"id":"prep-j830rz1","text":"Bystronic -> no answer, contact BySoft Suite team directly?","scope":"ams","done":true,"doneIn":[],"created":"2026-07-28"},{"id":"prep-1m74w2y","text":"SPI Circle Folien angepasst","scope":"ams","done":true,"doneIn":[],"created":"2026-07-28"},{"id":"prep-umeyab1","text":"Jour Fixe SimPlan absagen oder nicht?","scope":"ams","done":true,"doneIn":[],"created":"2026-07-28"},{"id":"prep-p6t0xty","text":"End of October will be an learning week - we have 1h to present MLS SPI","scope":"all","done":false,"doneIn":["ams"],"created":"2026-07-28"},{"id":"prep-7lweosc","text":"So that we don't have to talk 1h... do we wanna present some videos?","scope":"all","done":false,"doneIn":["ams"],"created":"2026-07-28"},{"id":"prep-p2n5xln","text":"Jour Fixe SimPlan -- How to prepare -- Infos mit Shashi","scope":"ams","done":true,"doneIn":[],"created":"2026-07-29"},{"id":"prep-h7ktf5h","text":"For BCHA visit: I need about 2h with Dario and Wei He - do we have time or do I need to arrive earlier","scope":"gcr","done":true,"doneIn":[],"created":"2026-07-29"},{"id":"prep-7aupvit","text":"We are not allowed, to present topics, that we are not paying fore (e.g. SmartMeters)","scope":"all","done":false,"doneIn":["mai"],"created":"2026-08-04"},{"id":"prep-jwplbbn","text":"Did you have a Look into Roomz?","scope":"gcr","done":false,"doneIn":[],"created":"2026-08-25"},{"id":"prep-pj3s34b","text":"What was the outcome out of this AI thing from Matthias Gräber?^- AI Space enhancements","scope":"gcr","done":false,"doneIn":[],"created":"2026-08-25"},{"id":"prep-auemxqs","text":"Shopfloor Hardware Diskussion","scope":"ams","done":false,"doneIn":[],"created":"2026-08-27"}]};
+const SEED_DATA = {"regions":[{"id":"eur","code":"EUR","name":"Europe","lead":"Fabio Saxer","note":"","projects":[{"id":"p-2o5i1ct","name":"Machine connectivity with ITENS in BZAM","lead":"","status":"In-Progress","notes":"","tasks":[],"archived":false,"hasImage":false,"notesAuthor":"","classification":"","problem":"","benefit":"","nextSteps":"","team":"","partners":""},{"id":"p-13phaar","name":"Employee enablement in BZAM, BUZ and BHWL","lead":"","status":"Exploration","notes":"","tasks":[],"archived":false,"hasImage":false,"notesAuthor":"","classification":"","problem":"","benefit":"","nextSteps":"","team":"","partners":""}],"log":[]},{"id":"buz","code":"BUZ","name":"BUZ","lead":"Roman Heuberger","note":"","projects":[{"id":"p-e250o10","name":"Evaluation of OEE software and machine connectivity","lead":"Fabio Keller","status":"Exploration","notes":"","tasks":[],"archived":false,"hasImage":false,"notesAuthor":"","classification":"Business Intelligence","problem":"In production, no actual times for the manufacturing steps are reported back.","benefit":"Better transparency regarding order state\nBetter comparison calculated times vs. actual times\nRoom for improvement","nextSteps":"Pre-analysis of possibly solution\nStart with initial workshop on 06.08.2026","team":"Roman Heuberger, Fabio Keller, Marco Niedermann","partners":""},{"id":"p-2r1b87o","name":"Evaluation of maintenance software","lead":"Fabio Saxer","status":"Exploration","notes":"","tasks":[],"archived":false,"hasImage":false,"notesAuthor":"","classification":"Business Intelligence","problem":"Maintenance Platform is outdated\nAI not integrable\nNot all information is digital\nDifferent solutions worldwide","benefit":"Establish the help of LLMs in the maintenance process to speed up\nHave all the information digitally available\nSmarter planning of maintenance tasks","nextSteps":"Definition of requirements for BUZ","team":"Fabio Saxer, Franz Schneider, Gianni Andriulli, Martin Schwyter","partners":"Remberg, ATR"},{"id":"p-uuvm0u3","name":"Druckluft","lead":"","status":"Idea","notes":"Zusammen mit der Uze","tasks":[],"archived":false,"hasImage":false,"notesAuthor":"Fabio Saxer","classification":"","problem":"","benefit":"","nextSteps":"","team":"","partners":""},{"id":"p-2dv61wa","name":"Track and Trace","lead":"Roman Heuberger","status":"Exploration","notes":"Truvami","tasks":[],"archived":false,"hasImage":false,"notesAuthor":"","classification":"Technology / Automation","problem":"Material gets lost at BUZ\nNo transparency over material flow and intralogistics","benefit":"Real-time transparency\nReduction of the search effort to zero\nBetter planning of production\nData basis for process analyses and optimization","nextSteps":"Start evaluation from another provider","team":"Fabio Keller, Roman Heuberger, Joel Oberholzer","partners":"Fraunhofer IPA"},{"id":"p-vjq71dq","name":"Time Study with Fraunhofer","lead":"Pascal Wälli","status":"Exploration","notes":"","tasks":[],"archived":false,"hasImage":false,"notesAuthor":"","classification":"AI","problem":"Pre-analysis of possibilities","benefit":"AI-supported time recording in production creates an objective and scalable data basis to make processes more transparent and recognize potential for improvement.","nextSteps":"Pre-analysis of possibly solution, providers\nSummary with advantages and disadvantages","team":"Pascal Waelli","partners":""},{"id":"p-lsy37e7","name":"Coating Robotic","lead":"Mirjam Rueegg","status":"Exploration","notes":"Phase 1 ist freigegeben","tasks":[],"archived":false,"hasImage":false,"notesAuthor":"","classification":"Robotics","problem":"In exploration what is possible","benefit":"Collaborative coating without teaching\nHigh flexibility with a variety of parts\nConsistent and reproducible quality\nCollaborative working with people","nextSteps":"Feasibility analysis done\nAlignment meeting in July done\nGo or No-Go decision open","team":"Thomas Schmidt, Fabio Keller, Daniel Galliker, Nenad Savic, Gaetano Fonseca","partners":"Gutmann Automation GmbH, Wagner International AG, Fraunhofer"},{"id":"p-4r21w3h","name":"Lehrlingsausbildung","lead":"Urs Schiess","status":"Idea","notes":"Weiterentwicklung (Digitales) Andon\nZustandserfassung der Vorbehandlungsbäder\nDigitale Nachricht bei Türöffnung vom Trockner\nReal Time Maschinenzustand auf dem Shopfloor","tasks":[],"archived":false,"hasImage":false,"notesAuthor":"Fabio Saxer","classification":"Business Intelligence","problem":"No real time visualization in the shopfloor","benefit":"More transparency and faster decisions\nLess downtime and reduced costs\nOptimized processes and higher efficiency","nextSteps":"Proof of Concept in VSCSP Department","team":"Roman Heuberger, Patrik Hoegger","partners":"Fraunhofer IPA"},{"id":"p-buzspi-01","name":"Semi-automated roll assembly","lead":"Roman Heuberger","status":"Idea","notes":"","tasks":[],"archived":false,"hasImage":false,"classification":"Technology / Automation","problem":"Currently, the rollers are being fitted - a time-consuming process","benefit":"More efficient during the process\nAssistant robots and automation for increased productivity","nextSteps":"Not started","team":"Dimitri Bueche, Patrik Hoegger","partners":"Fraunhofer IPA"},{"id":"p-buzspi-03","name":"Paperless Painting Shop","lead":"Roman Heuberger","status":"Idea","notes":"","tasks":[],"archived":false,"hasImage":false,"classification":"Business Intelligence","problem":"High manually work to collect key figures","benefit":"The digital recording and evaluation of important measurement data enables precise control and optimization of surface treatment.\nMore efficient and transparent, increases productivity","nextSteps":"Pre-analysis of possibly digital process control charts solution for pre-treatment baths","team":"Burim Rushiti, Thomas Schmidt, Nenad Savic, Gaetano Fonseca","partners":""},{"id":"p-buzspi-04","name":"Guided Process","lead":"","status":"Idea","notes":"","tasks":[],"archived":false,"hasImage":false,"classification":"Business Intelligence","problem":"","benefit":"","nextSteps":"No detail slide in the source PowerPoint - please complete","team":"","partners":""},{"id":"p-buzspi-05","name":"Digital Process Painting","lead":"Roman Heuberger","status":"Idea","notes":"","tasks":[],"archived":false,"hasImage":false,"classification":"Business Intelligence","problem":"No connection between Order/parts and the painting carrier","benefit":"Digital traceability for orders and parts\nMore efficient during the process, increases productivity\nPossibility to attach more digital solutions (Painting Cobot ...)","nextSteps":"Not started","team":"Thomas Schmidt, Nenad Savic, Gaetano Fonseca","partners":"Fraunhofer IPA"},{"id":"p-buzspi-06","name":"Twyn 2.0 - Integration","lead":"Samuel Sieber","status":"Idea","notes":"","tasks":[],"archived":false,"hasImage":false,"classification":"AR Guided work","problem":"No efficient integration into the Core System","benefit":"Integrated into the core systems\nBetter change management\nMore efficient way for new parts","nextSteps":"Not started","team":"Samet Kahriman, Urs Schiess, Roman Heuberger","partners":"Concircle (SAP DM)"},{"id":"p-buzspi-07","name":"System Manuals - video based","lead":"Roman Heuberger","status":"Idea","notes":"","tasks":[],"archived":false,"hasImage":false,"classification":"Business Intelligence","problem":"","benefit":"","nextSteps":"Not started","team":"Patrik Hoegger","partners":""},{"id":"p-buzspi-09","name":"Digital Processes Painting","lead":"","status":"Exploration","notes":"","tasks":[],"archived":false,"hasImage":false,"classification":"Business Intelligence","problem":"","benefit":"","nextSteps":"To check: possible duplicate of «Digital Process Painting» (Idea) - both circles appear in the source funnel chart","team":"","partners":""},{"id":"p-buzspi-10","name":"AI supported CNC progr.","lead":"Matthias Schmid","status":"In-Progress","notes":"","tasks":[],"archived":false,"hasImage":false,"classification":"AI","problem":"In exploration of more possibilities","benefit":"Shorter programming and set-up times\nFaster industrialization of new parts and variants\nRelief for experts - expertise remains in the system","nextSteps":"Setup project topics and project team\nExperience test phase with external partner\nFeasibility analysis and commercial in work","team":"Roman Heuberger, Patrik Naef, Ardit Jakupi","partners":"Manukai AG c/o ETH"},{"id":"p-buzspi-13","name":"Tooling Uber","lead":"Roman Heuberger","status":"Exploration","notes":"","tasks":[],"archived":false,"hasImage":false,"classification":"Robotics","problem":"In exploration of more possibilities","benefit":"More efficiency and less manual work\nFlexible routes and no fixed infrastructure\nGreater safety and can be used 24/7\nBetter scalability","nextSteps":"Experience test phase in the mechanic area\nTool service for the machines\nConcept work for other use cases (Bananenwagen, etc.)\nTest with sensor to open the doors automatically","team":"Pascal Waelli, Ralf Zellweger","partners":"Phoenix Mecano (MiR), Fraunhofer IPA"},{"id":"p-buzspi-16","name":"ETH Robot MVP","lead":"Tommaso Gazzini","status":"In-Progress","notes":"","tasks":[],"archived":false,"hasImage":false,"classification":"Robotics","problem":"In exploration what is possible","benefit":"Human-centered and technology-enabled\nAssistant robots and automation for increased productivity\nScalable and modular solutions for more flexibility","nextSteps":"Experience test phase with external partner\nProject C-Part Robotics started\nUse case defined (C-Parts Roller Mills)","team":"Marco Niedermann, Roman Heuberger, Joel Oberholzer, Pascal Waelli, Ralph Dieter Gabriel","partners":"ETH Zuerich"},{"id":"p-buzspi-17","name":"Digital Twin BUZ Factory","lead":"Roman Heuberger","status":"In-Progress","notes":"","tasks":[],"archived":false,"hasImage":false,"classification":"Digital Twin / Simulation","problem":"Without a digital twin, production is reactive, with a digital twin it becomes proactive.","benefit":"Initial planning quality\nReal-time monitoring of the work centers\nEarly warning system\nSuggestion system for measures (AI)","nextSteps":"Structure of the simulation model and the data connection (PoC) - Rolls, Set Handling, Machining, BCOA\nValidation and implementation of scheduling","team":"Alex Kunz, Fabio Keller, Fabio Saxer, Janine Zingg","partners":"SimPlan (Anylogic)"},{"id":"p-buzspi-18","name":"Shop Floor Dashboard","lead":"Roman Heuberger","status":"Scalability","notes":"","tasks":[],"archived":false,"hasImage":false,"classification":"Business Intelligence","problem":"The Excel solutions were not state of the art","benefit":"Local solution for production with actual key figures\nCan be scaled down for each value stream\nEmployees involvement to share information","nextSteps":"Mockup was finished, currently improving the solution\nAdjustments from the solution\nRollout all value streams","team":"Matthias Baumberger, Kresimir Vlaic, BUZ SPI Core Team","partners":""},{"id":"p-buzspi-19","name":"Slot plan 2.0","lead":"Damian Signer","status":"Scalability","notes":"","tasks":[],"archived":false,"hasImage":false,"classification":"Business Intelligence","problem":"Due to global requirements, the Excel solution was not state of the art","benefit":"Global solution\nDependence on PPP 3.0 solution\nCan be scaled down as required during the meeting\nComments and action list can be made directly in the tool","nextSteps":"BUZ solution online and in use (test phase)\nPreparation for other plants","team":"Matthias Baumberger, Fabrizio Elsener, Silvan Bruehwiler","partners":""},{"id":"p-buzspi-20","name":"Twyn 1.0 - Quality control","lead":"Samuel Sieber","status":"Scalability","notes":"","tasks":[],"archived":false,"hasImage":false,"classification":"AR Guided work","problem":"No digital solution for quality control in the production area","benefit":"Quality control in an efficient way\nCan be used anywhere\nAutomatically generated inspection report","nextSteps":"Use case and pilot phase done\nRollout BUZ / AP","team":"Samet Kahriman, Urs Schiess, Roman Heuberger","partners":"Visometry"},{"id":"p-buzspi-21","name":"Laser welding","lead":"","status":"Scalability","notes":"","tasks":[],"archived":false,"hasImage":false,"classification":"Technology / Automation","problem":"","benefit":"","nextSteps":"No detail slide in the source PowerPoint - please complete","team":"","partners":""},{"id":"p-buzspi-22","name":"AI for Routings","lead":"Torben Baube, Mitar Jojic","status":"On Hold","notes":"","tasks":[],"archived":false,"hasImage":false,"classification":"AI","problem":"In exploration of more possibilities","benefit":"Improve master data quality and efficiency","nextSteps":"Collect examples from mechanical and sheet metal parts that would be similar in terms of routings\nAI training with some examples\nOn hold - restart after summer holidays","team":"Daniel Galliker, Patrick Naef, Matthias Graeber, Hemanth Nagaraja, Sudhir Punyamurthula","partners":""},{"id":"p-buzspi-23","name":"Auto AKL Servus","lead":"Patrick Braegger","status":"On Hold","notes":"","tasks":[],"archived":false,"hasImage":false,"classification":"Technology / Automation","problem":"In exploration of more possibilities","benefit":"Reintegration of small parts warehouse\nIncreased efficiency through automated processes and minimized personnel deployment\nHigh system stability and low operating and maintenance costs","nextSteps":"Pre-analysis of possibly solution","team":"Marco Niedermann, Urs Cadisch, Iris Niedermann, Roman Heuberger","partners":"SERVUS"},{"id":"p-buzspi-24","name":"AI in Quality","lead":"Samuel Sieber","status":"On Hold","notes":"","tasks":[],"archived":false,"hasImage":false,"classification":"AI","problem":"In exploration of more possibilities","benefit":"Quick responses to historical data regarding the frequent quality problems from a product","nextSteps":"On hold","team":"Urs Schiess, Roman Heuberger","partners":"Qlaire, Swiss Data Science Center"},{"id":"p-buzspi-25","name":"Intralog Track & Trace Part1","lead":"Joel Oberholzer, Max Weber","status":"Stopped","notes":"","tasks":[],"archived":false,"hasImage":false,"classification":"Technology / Automation","problem":"Material gets lost at BUZ\nNo transparency over material flow and intralogistics","benefit":"Real-time transparency\nReduction of the search effort to zero\nBetter planning of production\nData basis for process analyses and optimization","nextSteps":"Pilot phase 1 (install and testing from system and equipment)\nNot at target (98% hit rate)\nExit strategy with current provider\nStart evaluation from another provider","team":"Fabio Keller, Roman Heuberger, Set Center, Assembly VSD GB1","partners":"Cancom / Ancom, Flowcate, Fraunhofer IPA"},{"id":"p-buzspi-26","name":"ETH Cobot in assembly","lead":"","status":"Stopped","notes":"","tasks":[],"archived":false,"hasImage":false,"classification":"Robotics","problem":"","benefit":"","nextSteps":"No detail slide in the source PowerPoint - please complete","team":"","partners":""},{"id":"p-buzspi-27","name":"ETH AI UC in MLS","lead":"","status":"Scalability","notes":"","tasks":[],"archived":true,"hasImage":false,"classification":"AI","problem":"","benefit":"","nextSteps":"Closed in 2025","team":"","partners":"ETH Zuerich"},{"id":"p-buzspi-28","name":"Fraunhofer assessment","lead":"","status":"Scalability","notes":"","tasks":[],"archived":true,"hasImage":false,"classification":"AI","problem":"","benefit":"","nextSteps":"Closed in 2025","team":"","partners":"Fraunhofer"}],"log":[]},{"id":"gcr","code":"GCR","name":"Greater China Region","lead":"Yan Chen","note":"","projects":[{"id":"p-q79s59c","name":"Lighthouse","lead":"","status":"Exploration","notes":"Zoomlion or CMCU\nPartner evaluation pending for August\nAGVs\nDigital Twin","tasks":[],"archived":false,"hasImage":false,"notesAuthor":"Fabio Saxer","classification":"","problem":"","benefit":"","nextSteps":"","team":"","partners":""},{"id":"p-tawxqcc","name":"Smart inspection","lead":"","status":"Exploration","notes":"Sheet metal\nAssembly\nelectronic installation","tasks":[],"archived":false,"hasImage":false,"notesAuthor":"Fabio Saxer","classification":"","problem":"","benefit":"","nextSteps":"","team":"","partners":""},{"id":"p-rkezyf9","name":"Agentic AIs","lead":"","status":"Exploration","notes":"routing based on 3D drawing -- cost estemation\nCNC part - 98% accuracy\nAssembly with SOP - accuracy pending","tasks":[],"archived":false,"hasImage":false,"notesAuthor":"Fabio Saxer","classification":"","problem":"","benefit":"","nextSteps":"","team":"","partners":""},{"id":"p-fh79tme","name":"Robotics","lead":"","status":"Exploration","notes":"iSage (integrator), Estun (producer) and many more : )\nShanghai AI institute - potential soultion for BCHA","tasks":[],"archived":false,"hasImage":false,"notesAuthor":"Fabio Saxer","classification":"","problem":"","benefit":"","nextSteps":"","team":"","partners":""},{"id":"p-9zeb37s","name":"SmartMeters","lead":"","status":"Incubation","notes":"","tasks":[],"archived":false,"hasImage":false,"notesAuthor":"","classification":"","problem":"","benefit":"","nextSteps":"","team":"","partners":""}],"log":[]},{"id":"mai","code":"MAI","name":"Middle East, Africa, India","lead":"Sudhir Punyamurthula","note":"","projects":[{"id":"p-mai001","name":"Slot Planning","lead":"","status":"Incubation","notes":"IP Area: Planning, IE and PE\nExternal Solution: Yes","tasks":[],"archived":false,"hasImage":false,"classification":"Value Enhancement","problem":"","benefit":"","nextSteps":"","team":"","partners":"Dhruv Technologies"},{"id":"p-mai002","name":"Order Management","lead":"","status":"Idea","notes":"IP Area: Planning, IE and PE\nExternal Solution: Yes","tasks":[],"archived":false,"hasImage":false,"classification":"Value Enhancement","problem":"","benefit":"","nextSteps":"","team":"","partners":"Dhruv Technologies"},{"id":"p-mai003","name":"JDI + Production Tracking","lead":"","status":"Incubation","notes":"IP Area: Planning, IE and PE\nExternal Solution: No","tasks":[],"archived":false,"hasImage":false,"classification":"Value Enhancement","problem":"","benefit":"","nextSteps":"","team":"","partners":"Buhler AI tools"},{"id":"p-mai004","name":"MES + Order Predictability","lead":"","status":"Exploration","notes":"IP Area: Planning, IE and PE\nExternal Solution: No","tasks":[],"archived":false,"hasImage":false,"classification":"Value Enhancement","problem":"","benefit":"","nextSteps":"","team":"","partners":"ITP (SAP DM)"},{"id":"p-mai005","name":"Order Processing","lead":"","status":"Incubation","notes":"IP Area: Planning, IE and PE\nExternal Solution: No","tasks":[],"archived":false,"hasImage":false,"classification":"Automation","problem":"","benefit":"","nextSteps":"","team":"","partners":"MLS+ITP (RPA)"},{"id":"p-mai006","name":"Master data and routings","lead":"","status":"Exploration","notes":"IP Area: Planning, IE and PE\nExternal Solution: No","tasks":[],"archived":false,"hasImage":false,"classification":"Automation","problem":"","benefit":"","nextSteps":"","team":"","partners":"MLS+ITP (RPA+ Buhler AI tools)"},{"id":"p-mai007","name":"MFT template - PLC","lead":"","status":"In-Progress","notes":"IP Area: Planning, IE and PE\nExternal Solution: No","tasks":[],"archived":false,"hasImage":false,"classification":"Data Quality","problem":"","benefit":"","nextSteps":"","team":"","partners":"MLS+ITP (RPA+ Buhler AI tools)"},{"id":"p-mai008","name":"MRP parameters adjustment","lead":"","status":"Incubation","notes":"IP Area: Planning, IE and PE\nExternal Solution: No","tasks":[],"archived":false,"hasImage":false,"classification":"Data Quality","problem":"","benefit":"","nextSteps":"","team":"","partners":"MLS+ITP (RPA)"},{"id":"p-mai009","name":"ECN management","lead":"","status":"In-Progress","notes":"IP Area: Planning, IE and PE\nExternal Solution: No","tasks":[],"archived":false,"hasImage":false,"classification":"Data Quality","problem":"","benefit":"","nextSteps":"","team":"","partners":"MLS+ITP (RPA)"},{"id":"p-mai010","name":"WMS: Material Traceability, Alerts, Analytics","lead":"","status":"Idea","notes":"IP Area: Logistics\nExternal Solution: Combined","tasks":[],"archived":false,"hasImage":false,"classification":"Value Enhancement","problem":"","benefit":"","nextSteps":"","team":"","partners":"EWM, CMTI, Aumovio"},{"id":"p-mai011","name":"Picking Optimization (SL opt+wave picking)","lead":"","status":"In-Progress","notes":"IP Area: Logistics\nExternal Solution: No","tasks":[],"archived":false,"hasImage":false,"classification":"Value Enhancement","problem":"","benefit":"","nextSteps":"","team":"","partners":"MLS + ITP (EWM+physical opt)"},{"id":"p-mai012","name":"Virtual Kitting","lead":"","status":"Idea","notes":"IP Area: Logistics\nExternal Solution: No","tasks":[],"archived":false,"hasImage":false,"classification":"Value Enhancement","problem":"","benefit":"","nextSteps":"","team":"","partners":"MLS+ITP (RPA+ Buhler AI tools)"},{"id":"p-mai013","name":"Binning intelligence (Dynamic storage location)","lead":"","status":"Exploration","notes":"IP Area: Logistics\nExternal Solution: No","tasks":[],"archived":false,"hasImage":false,"classification":"Automation","problem":"","benefit":"","nextSteps":"","team":"","partners":"MLS + ITP (EWM+physical opt)"},{"id":"p-mai014","name":"OT: AS/RS, Scanners, Pick/Put to light","lead":"","status":"In-Progress","notes":"IP Area: Logistics\nExternal Solution: Yes","tasks":[],"archived":false,"hasImage":false,"classification":"Automation","problem":"","benefit":"","nextSteps":"","team":"","partners":"Craftsman Automation, zebronics etc."},{"id":"p-mai015","name":"Stock counting and ageing","lead":"","status":"Exploration","notes":"IP Area: Logistics\nExternal Solution: Yes","tasks":[],"archived":false,"hasImage":false,"classification":"Data Quality","problem":"","benefit":"","nextSteps":"","team":"","partners":"Aumovio"},{"id":"p-mai016","name":"Storage location sync","lead":"","status":"Idea","notes":"IP Area: Logistics\nExternal Solution: No","tasks":[],"archived":false,"hasImage":false,"classification":"Data Quality","problem":"","benefit":"","nextSteps":"","team":"","partners":"MLS + ITP (EWM+physical opt)"},{"id":"p-mai017","name":"Supplier Portal","lead":"","status":"Exploration","notes":"IP Area: SCM\nExternal Solution: No","tasks":[],"archived":false,"hasImage":false,"classification":"Value Enhancement","problem":"","benefit":"","nextSteps":"","team":"","partners":"MLS + ITP (Buhler AI tools)"},{"id":"p-mai018","name":"On demand mfg - localization","lead":"","status":"Exploration","notes":"IP Area: SCM\nExternal Solution: Yes","tasks":[],"archived":false,"hasImage":false,"classification":"Value Enhancement","problem":"","benefit":"","nextSteps":"","team":"","partners":"Zetwerk, Terra 91, Custiv"},{"id":"p-mai019","name":"Analytics - OTD, OTIF, Material coverage","lead":"","status":"In-Progress","notes":"IP Area: SCM\nExternal Solution: No","tasks":[],"archived":false,"hasImage":false,"classification":"Value Enhancement","problem":"","benefit":"","nextSteps":"","team":"","partners":"MLS + ITP (SAC, Buhler AI tools)"},{"id":"p-mai020","name":"Demand Forecasts/ Scheduling agreements","lead":"","status":"Exploration","notes":"IP Area: SCM\nExternal Solution: No","tasks":[],"archived":false,"hasImage":false,"classification":"Automation","problem":"","benefit":"","nextSteps":"","team":"","partners":"MLS + ITP (SAP, Buhler AI tools)"},{"id":"p-mai021","name":"PO admin work automation","lead":"","status":"In-Progress","notes":"IP Area: SCM\nExternal Solution: No","tasks":[],"archived":false,"hasImage":false,"classification":"Automation","problem":"","benefit":"","nextSteps":"","team":"","partners":"MLS+ITP (RPA+ Buhler AI tools)"},{"id":"p-mai022","name":"OC and Delivery reminders","lead":"","status":"Exploration","notes":"IP Area: SCM\nExternal Solution: No","tasks":[],"archived":false,"hasImage":false,"classification":"Automation","problem":"","benefit":"","nextSteps":"","team":"","partners":"MLS+ITP (RPA+SAP+ Buhler AI tools)"},{"id":"p-mai023","name":"Sourcing Manual and Spec comparison","lead":"","status":"Idea","notes":"IP Area: SCM\nExternal Solution: No","tasks":[],"archived":false,"hasImage":false,"classification":"Automation","problem":"","benefit":"","nextSteps":"","team":"","partners":"MLS+ITP (RPA+SAP+ Buhler AI tools)"},{"id":"p-mai024","name":"Inforecords & source list accuracy","lead":"","status":"In-Progress","notes":"IP Area: SCM\nExternal Solution: No","tasks":[],"archived":false,"hasImage":false,"classification":"Data Quality","problem":"","benefit":"","nextSteps":"","team":"","partners":"MLS+ITP (RPA+ Buhler AI tools)"},{"id":"p-mai025","name":"Procurement data cleanup (reservations, PRs, POs)","lead":"","status":"In-Progress","notes":"IP Area: SCM\nExternal Solution: No","tasks":[],"archived":false,"hasImage":false,"classification":"Data Quality","problem":"","benefit":"","nextSteps":"","team":"","partners":"MLS+ITP (RPA+ Buhler AI tools)"},{"id":"p-mai026","name":"Parts Clustering and source identification","lead":"","status":"Exploration","notes":"IP Area: SCM\nExternal Solution: No","tasks":[],"archived":false,"hasImage":false,"classification":"Data Quality","problem":"","benefit":"","nextSteps":"","team":"","partners":"MLS+ITP (RPA+ Buhler AI tools)"},{"id":"p-mai027","name":"PFMEA --> AI backed","lead":"","status":"Incubation","notes":"IP Area: Quality\nExternal Solution: No","tasks":[],"archived":false,"hasImage":false,"classification":"Value Enhancement","problem":"","benefit":"","nextSteps":"","team":"","partners":"Qlaire"},{"id":"p-mai028","name":"8D assistaince","lead":"","status":"Exploration","notes":"IP Area: Quality\nExternal Solution: No","tasks":[],"archived":false,"hasImage":false,"classification":"Value Enhancement","problem":"","benefit":"","nextSteps":"","team":"","partners":"Qlaire"},{"id":"p-mai029","name":"Automated/Assisted Inspection","lead":"","status":"Exploration","notes":"IP Area: Quality\nExternal Solution: Yes","tasks":[{"id":"t-k0a1n9c","text":"Support with ITP Discusstions","done":false,"date":"2026-09-03"}],"archived":false,"hasImage":false,"classification":"Automation","problem":"","benefit":"","nextSteps":"","team":"","partners":"Rosh AI, ATQ Metro"},{"id":"p-mai030","name":"Quality/CIP entry","lead":"","status":"Idea","notes":"IP Area: Quality\nExternal Solution: No","tasks":[],"archived":false,"hasImage":false,"classification":"Automation","problem":"","benefit":"","nextSteps":"","team":"","partners":"MLS+ITP (RPA+ Buhler AI tools)"},{"id":"p-mai031","name":"Cost Center budgeting and spend analytics","lead":"","status":"Idea","notes":"IP Area: Controlling\nExternal Solution: TBD","tasks":[],"archived":false,"hasImage":false,"classification":"Value Enhancement","problem":"","benefit":"","nextSteps":"","team":"","partners":""},{"id":"p-mai032","name":"Part Cost estimation","lead":"","status":"Exploration","notes":"IP Area: Controlling\nExternal Solution: No","tasks":[],"archived":false,"hasImage":false,"classification":"Value Enhancement","problem":"","benefit":"","nextSteps":"","team":"","partners":"MLS+ITP (RPA+ Buhler AI tools)"},{"id":"p-mai033","name":"Stock Plan","lead":"","status":"Scalability","notes":"IP Area: Controlling\nExternal Solution: No","tasks":[],"archived":false,"hasImage":false,"classification":"Value Enhancement","problem":"","benefit":"","nextSteps":"","team":"","partners":"MLS+ITP (RPA+ Buhler AI tools)"},{"id":"p-mai034","name":"MO variance analysis","lead":"","status":"Idea","notes":"IP Area: Controlling\nExternal Solution: TBD","tasks":[],"archived":false,"hasImage":false,"classification":"Automation","problem":"","benefit":"","nextSteps":"","team":"","partners":""},{"id":"p-mai035","name":"Order Closing","lead":"","status":"Idea","notes":"IP Area: Controlling\nExternal Solution: TBD","tasks":[],"archived":false,"hasImage":false,"classification":"Automation","problem":"","benefit":"","nextSteps":"","team":"","partners":""},{"id":"p-mai036","name":"AMR","lead":"","status":"Incubation","notes":"IP Area: Shopfloor\nExternal Solution: Yes","tasks":[],"archived":false,"hasImage":false,"classification":"Automation","problem":"","benefit":"","nextSteps":"","team":"","partners":"M2NXT"}],"log":[]},{"id":"ams","code":"AMS","name":"Americas","lead":"Lucia Manatschal","note":"","projects":[{"id":"p-akelt3z","name":"Machine connectivity with BySoft","lead":"","status":"Stopped","notes":"","tasks":[],"archived":true,"hasImage":false,"notesAuthor":"","classification":"","problem":"","benefit":"","nextSteps":"","team":"","partners":""},{"id":"p-qiy8vge","name":"Implementation of ProPlant as maintenance software","lead":"Fabio Saxer","status":"Incubation","notes":"","tasks":[],"archived":false,"hasImage":false,"notesAuthor":"","classification":"","problem":"","benefit":"","nextSteps":"","team":"","partners":""},{"id":"p-53jmswn","name":"Roomz workplace transparency","lead":"","status":"On Hold","notes":"","tasks":[],"archived":false,"hasImage":false,"notesAuthor":"","classification":"","problem":"","benefit":"","nextSteps":"","team":"","partners":""},{"id":"p-4r5t6to","name":"Robotics","lead":"","status":"Exploration","notes":"Problems with Firmwareupdate and Docking...\nDreame does not want to help us, since we bought it with an unautorised vendor","tasks":[],"archived":false,"hasImage":false,"notesAuthor":"Fabio Saxer","classification":"","problem":"","benefit":"","nextSteps":"","team":"","partners":""}],"log":[]}],"global":{"lead":"Fabio Saxer","projects":[{"id":"p-eoc5toy","name":"REWO work instructions","lead":"Lucia Manatschal","status":"In-Progress","notes":"","tasks":[],"archived":false,"hasImage":false,"notesAuthor":"","classification":"","problem":"","benefit":"","nextSteps":"","team":"","partners":""},{"id":"p-fs4y40p","name":"Digital twin & simulation with SimPlan","lead":"Jris Niedermann","status":"Exploration","notes":"BUZ - Walzenfertigung\n","tasks":[],"archived":false,"hasImage":false,"notesAuthor":"Fabio Saxer","classification":"","problem":"","benefit":"","nextSteps":"","team":"","partners":""},{"id":"p-hqpk4oq","name":"AI support in cost estimation","lead":"","status":"Exploration","notes":"NAM - Collin: simple Promt\nNAM - Ben: Hardcoded Inventor estimation\nNAM - Lucia: AI Training for Welding symbols (Phyton)\nEUR - Karoline: AI Prompt more established and with BÃƒÂ¼hler Process Data behind.","tasks":[],"archived":false,"hasImage":false,"notesAuthor":"Fabio Saxer","classification":"","problem":"","benefit":"","nextSteps":"","team":"","partners":""}],"log":[]},"prepItems":[{"id":"prep-ux9by6s","text":"Durckerformat","scope":"ams","done":true,"doneIn":[],"created":"2026-07-22","author":"Fabio Saxer"},{"id":"prep-mz7ipj2","text":"Falls Jris dabei: RÃƒÂ¼ckmeldung Fabrizio Simplan","scope":"ams","done":true,"doneIn":[],"created":"2026-07-22","author":"Fabio Saxer"},{"id":"prep-xj7eio8","text":"Lehrlingsausbildung","scope":"buz","done":true,"doneIn":[],"created":"2026-07-22","author":"Fabio Saxer"},{"id":"prep-1sabjti","text":"Rewo newly with BCHA","scope":"gcr","done":true,"doneIn":[],"created":"2026-07-22","author":"Fabio Saxer"},{"id":"prep-859bo4y","text":"https://www.filics.eu/en","scope":"buz","done":false,"doneIn":[],"created":"2026-07-23","author":"Fabio Saxer"},{"id":"prep-j830rz1","text":"Bystronic -> no answer, contact BySoft Suite team directly?","scope":"ams","done":true,"doneIn":[],"created":"2026-07-28","author":"Fabio Saxer"},{"id":"prep-1m74w2y","text":"SPI Circle Folien angepasst","scope":"ams","done":true,"doneIn":[],"created":"2026-07-28","author":"Fabio Saxer"},{"id":"prep-umeyab1","text":"Jour Fixe SimPlan absagen oder nicht?","scope":"ams","done":true,"doneIn":[],"created":"2026-07-28","author":"Fabio Saxer"},{"id":"prep-p6t0xty","text":"End of October will be an learning week - we have 1h to present MLS SPI","scope":"all","done":false,"doneIn":["ams"],"created":"2026-07-28","author":"Fabio Saxer"},{"id":"prep-7lweosc","text":"So that we don't have to talk 1h... do we wanna present some videos?","scope":"all","done":false,"doneIn":["ams"],"created":"2026-07-28","author":"Fabio Saxer"},{"id":"prep-p2n5xln","text":"Jour Fixe SimPlan -- How to prepare -- Infos mit Shashi","scope":"ams","done":true,"doneIn":[],"created":"2026-07-29","author":"Fabio Saxer"},{"id":"prep-h7ktf5h","text":"For BCHA visit: I need about 2h with Dario and Wei He - do we have time or do I need to arrive earlier","scope":"gcr","done":true,"doneIn":[],"created":"2026-07-29","author":"Fabio Saxer"},{"id":"prep-7aupvit","text":"We are not allowed, to present topics, that we are not paying fore (e.g. SmartMeters)","scope":"all","done":false,"doneIn":["mai","ams","gcr","buz"],"created":"2026-08-04","author":"Fabio Saxer"},{"id":"prep-jwplbbn","text":"Did you have a Look into Roomz?","scope":"gcr","done":false,"doneIn":[],"created":"2026-08-25","author":"Fabio Saxer"},{"id":"prep-pj3s34b","text":"What was the outcome out of this AI thing from Matthias Gräber?^- AI Space enhancements","scope":"gcr","done":true,"doneIn":[],"created":"2026-08-25","author":"Fabio Saxer"},{"id":"prep-auemxqs","text":"Shopfloor Hardware Diskussion","scope":"ams","done":false,"doneIn":[],"created":"2026-08-27","author":"Fabio Saxer"},{"id":"prep-jpsebxn","text":"What do we do with this f***ing Learning Week","scope":"ams","done":false,"doneIn":[],"created":"2026-09-01","author":"Fabio Saxer"},{"id":"prep-6eqeoxr","text":"Who is in the lead regarding the EB Presentation in October? -> I'm not here, so idc : )","scope":"gcr","done":false,"doneIn":[],"created":"2026-09-02","author":"Fabio Saxer"},{"id":"prep-36vqvju","text":"LaserCAM - was sind die nächsten Schritte?","scope":"ams","done":false,"doneIn":[],"created":"2026-09-08","author":"Lucia Manatschal"},{"id":"prep-8d3p077","text":"Serverstruktur - können wir die Anylogic Lizenzen dort anhängen?","scope":"ams","done":true,"doneIn":[],"created":"2026-09-08","author":"Lucia Manatschal"},{"id":"prep-v3e2gmn","text":"Was ist betreffend Arbeitsanleitungen angedacht? - Rewo?","scope":"buz","done":false,"doneIn":[],"created":"2026-09-09","author":"Fabio Saxer"},{"id":"prep-o00xg7x","text":"ProPlant - Wie geht es Mauro?","scope":"ams","done":false,"doneIn":[],"created":"2026-09-09","author":"Fabio Saxer"},{"id":"prep-711ea6d","text":"REWO - IT Lehrling? Workshop in BUZ mit Q-Team oder in BSSE?","scope":"ams","done":false,"doneIn":[],"created":"2026-09-17","author":"Lucia Manatschal"},{"id":"prep-li2cnsi","text":"create network driver for BCOA on our server COAN35 (brauchen wir somit überhaupt kein SharePoint)","scope":"ams","done":false,"doneIn":[],"created":"2026-09-24","author":"Lucia Manatschal"},{"id":"prep-r8dqui6","text":"Besprechung mit SimPlan vorbereiten resp. abstimmen","scope":"ams","done":false,"doneIn":[],"created":"2026-09-29","author":"Lucia Manatschal"}]};
 
 function defaultData(){
   return JSON.parse(JSON.stringify(SEED_DATA));
@@ -592,6 +720,7 @@ function normalizeData(){
       if(!p.tasks) p.tasks = [];
       if(typeof p.notes!=='string') p.notes = '';
       if(typeof p.lead!=='string') p.lead = '';
+      DETAIL_FIELDS.forEach(f=>{ if(typeof p[f.key]!=='string') p[f.key] = ''; });
     });
   };
   const fixLog = (arr)=>{ (arr||[]).forEach(l=>{ if(!l.id) l.id = uid('log'); if(typeof l.author!=='string') l.author = ''; }); };
@@ -862,6 +991,7 @@ function projectCardHtml(p, ownerKey, opts){
       <select class="status-select st-${STATUS_CLASS[p.status]}" data-action="set-status" data-owner="${ownerKey}" data-project="${p.id}">${statusOptions}</select>
     </div>
     <textarea placeholder="Notes from the exchange..." data-action="set-notes" data-owner="${ownerKey}" data-project="${p.id}">${escapeHtml(p.notes||'')}</textarea>
+    ${detailsSectionHtml(p, ownerKey)}
     ${p.hasImage?`<div class="pcard-image-wrap" data-project-image="${p.id}"><div class="img-loading">Loading photo…</div></div>`:''}
     <div class="photo-row">
       <label class="photo-label">${p.hasImage?'Replace photo':'+ Add photo'}<input type="file" accept="image/*" data-action="upload-image" data-owner="${ownerKey}" data-project="${p.id}"></label>
@@ -877,6 +1007,25 @@ function projectCardHtml(p, ownerKey, opts){
       <button class="danger" data-action="delete-project" data-owner="${ownerKey}" data-project="${p.id}">Delete</button>
     </div>
   </div>`;
+}
+
+const openDetailSections = new Set();
+function detailsSectionHtml(p, ownerKey){
+  const filled = DETAIL_FIELDS.filter(f=>(p[f.key]||'').trim()).length;
+  const ci = catInfo(p.classification);
+  const fields = DETAIL_FIELDS.map(f=>{
+    const val = escapeHtml(p[f.key]||'');
+    const attrs = `data-action="set-field" data-field="${f.key}" data-owner="${ownerKey}" data-project="${p.id}"`;
+    const ctl = f.type==='textarea'
+      ? `<textarea rows="${Math.min(6, Math.max(2, (p[f.key]||'').split('\n').length))}" ${attrs}>${val}</textarea>`
+      : `<input type="text" value="${val}" ${f.key==='classification'?'list="catOptions" placeholder="Pick or type a new one"':''} ${attrs}>`;
+    return `<label class="pd-field${f.type==='textarea'?' pd-wide':''}"><span>${f.label}</span>${ctl}</label>`;
+  }).join('');
+  const meta = (p.classification ? `<i class="catdot" style="background:${ci.bg};color:${ci.fg}">${escapeHtml(ci.code)}</i>${escapeHtml(ci.label)} · ` : '') + `${filled}/${DETAIL_FIELDS.length} filled`;
+  return `<details class="pdetails" data-details="${p.id}" ${openDetailSections.has(p.id)?'open':''}>
+    <summary><span>Details for funnel &amp; slides</span><span class="pd-meta">${meta}</span></summary>
+    <div class="pd-grid">${fields}</div>
+  </details>`;
 }
 
 function escapeHtml(s){
@@ -1006,6 +1155,7 @@ function renderExchange(){
   const archived = archivedOnly(stop.projects);
 
   html += `<div class="panel"><h4>${stop.isGlobal ? 'Global Projects' : "This region's projects"}</h4>`;
+  html += `<datalist id="catOptions">${classificationOptions().map(c=>`<option value="${escapeHtml(c)}">`).join('')}</datalist>`;
   html += activeProjects.length ? activeProjects.map(p=>projectCardHtml(p, stopId)).join('') : `<div class="empty" style="padding:20px 0;">No active projects yet — add the first one below.</div>`;
   html += `<button class="add-project-toggle" id="addProjectToggle">+ Add a project</button>
     <div class="add-project-form" id="addProjectForm" style="display:none;">
@@ -1096,6 +1246,24 @@ function attachExchangeEvents(stopId, isGlobal){
       const p = arr.find(x=>x.id===el.getAttribute('data-project'));
       p.notes = el.value;
       await saveData();
+    });
+  });
+
+  document.querySelectorAll('[data-action="set-field"]').forEach(el=>{
+    el.addEventListener('change', async ()=>{
+      const arr = findProjectArr(el.getAttribute('data-owner'));
+      const p = arr.find(x=>x.id===el.getAttribute('data-project'));
+      const key = el.getAttribute('data-field');
+      const val = el.value.trim();
+      if((p[key]||'')===val) return;
+      p[key] = key==='classification' && val ? catInfo(val).label : val;
+      await saveData();
+    });
+  });
+  document.querySelectorAll('details.pdetails').forEach(d=>{
+    d.addEventListener('toggle', ()=>{
+      const id = d.getAttribute('data-details');
+      if(d.open) openDetailSections.add(id); else openDetailSections.delete(id);
     });
   });
 
@@ -1529,6 +1697,591 @@ function renderTasks(){
   });
 }
 
+/* ---------------- Funnel ----------------
+   A second view on the same projects: a staged funnel with PowerPoint/PDF export. Geometry,
+   token sizing and slide layout are taken from the BUZ "MLF Total Funnel" tool so both tools
+   produce the same family of slides. Read-only here — editing stays in Exchange Mode. */
+const BRAND_LOGO="data:image/png;base64,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";
+const BRAND_GRADIENT="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAkGBwgHBgkIBwgKCgkLDRYPDQwMDRsUFRAWIB0iIiAdHx8kKDQsJCYxJx8fLT0tMTU3Ojo6Iys/RD84QzQ5Ojf/2wBDAQoKCg0MDRoPDxo3JR8lNzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzf/wAARCALQBQADASIAAhEBAxEB/8QAHAABAQEBAQEBAQEAAAAAAAAAAAECAwcIBgQF/8QAGxABAQEBAQEBAQAAAAAAAAAAAAEREgIxYUH/xAAbAQEBAQEAAwEAAAAAAAAAAAAAAQIDBAUGB//EABoRAQEBAQEBAQAAAAAAAAAAAAABEQISAxP/2gAMAwEAAhEDEQA/APMp8VJ8V571gAAAAAAAAAAAAAAAAAAAAAABAABFCAAACgqKAIsIKACiCxFVFixGoILEWCKQWCKQWKgsFgyKKIRRYIRRYIRSLFQiiwRYsRRlViRoQWEiiDUSRRlYosghFFkEFg1BkWEiiCwUQUWIhFFgyRSKILBUQWCogsRoBYioirEWJUaixIsZqrFSLGaNRqMxqOdajUajMWOdbjUajMajnY1G41KxGo49R0lblblc41K5WOkrpK1K5xqVx6jpK6ytSuUrcrj1y6SusrUrlK1K49cusrrK3K4ytSuPXLpK7StT04ytyuHXDrOnaelnpxlanpyvDpOnaemp6cZVnpyvDpOneemp6cJ6anpy6+bpOneel6cJ6anpyvzdJ27z2s9uE9LPTnfm3O3ee2u3889L0xfm3O3fte3Do6Z/Jfbv2vbh0dJ+S+3fs7cejr9T8l9u3a9uHR0n5L7d+ztw6Xo/I9u3Z05dHSfmvt26OnHpdT8z269HTlq6nhfTr0dOWrqeF9OnS9Oems+F9Ommsaup5Nb01jV1PK61q6zomLrQisq+cZ8VJ8V+zPnAAAAAAAAAAAAAAAAAAAAAAAAQABYAAAosWIogQUQUUAARVRYIsWIqosVIoysVFEWKiwQiixUIoohGkiwRViKIqkUZIosghFgoyNJI0IRRZBBYNSDJIoohFJFE0ijUgyLIYogsFwQiiyCEii4jJFFgCiwQgLEQiixEIoCLFiKyqqipRYsSNRiqsajMajFaixqMxYxVajUZixzrUbjUYjUc66RuLGYscrG46RZWJWo5WNx0lalc41K5dR0ldJWpXOVqVxsdJXSVqVzlalcrHSV0lalcpWtcry6SukrUrnKsrleXSV0lalc5Vlc7y3K6StSucq65Xl0ldNXXOVZWLy3OnSVqVy1dYvLU6dejpz01jw16dejpz01PC+nXo6cul6Twvp06OnPo1PC+nTpenPTTwenTVlc9XWbws6dOl6ctXWfDXp01dc9XWfK+nTTXPV1nyvp01dc9XWby1rpq656srN5WV01ZWJV1ixqVvRmVdYsalaWMrGbGpW4sZixzrUfOU+Kk+K/ZXzoAAAAAAAAAAAAAAAAAAAAAAAIKiwAABUVUUFABRBQEFRQVYkUZVUiqirEURViRRlVSNCCwiiCwiqgpFEIosGSNRGpBCRYLBBZCRRkagsghIuKsgySLCKJaLISNSDKRokWQQkUUQUkUTRZCRpGUxcWRREUUQUkVAFURIoqIKAgoqBFgMqKLEoqxFjFWK1GWma1FixIrFWNRYkWOdbjUWMxqMVqNRqMxY5VuNRqMxY52NxuNSsRY52OkblalYlWVysbldJWpXOVqVysdJW5WpXOVqVzsblblalc5WpXOx0lblalc5WtcrG5W5V1z1qVi8tStyrrnrUrF5blblXXPV1ny1rerrnq6z5X03q656anlfTpprGmnk9N6uuerqeV9N6uuerrPlfTerrGrrN5WVvV1z1dZvLXp01dc9WVm8rK6auuerrF5aldJVlc5WpWLy1K3KusasrFjUrcrUrEq6xeW5W9XWJWpWLGpW5VjErUrnY3K3GoxG45dNx85T4qT4r9jfPAAAAAAAAAAAAAAAAAAAAAEAAEFAAABSLFQUgAoogCiEVFgixUWCKsRYrKqkaEFgsEIosEWEFEVZEjQyLCRVQi4SLBlZFFghFkJGhlGpCRZBCRoWQZJFkJGhNRqGLIMkiyEjUERrDFxE0WQkUZMWQxZBBcFwQUXEQXAEFwkUQBUBQEFCICgirAixKgqKyqrEWM1pVSKzVjSsxqMVqLGmVYrUajUZixzrcajUZixzrUaixlYxY3G4sZWOdjcbixmLHOxuNrKzFjnY3G4srEajnY3GmpWIsrnY3K3qysauudjcrerKxKus2NSt6usaax5a1vV1jTU8rrerrnq6nldb01jTU8mt6usaanldb1dY01PK63q6xq6zYut6usasrNjUrcq6xq6xY1K3qysasrFjUrcqysaus2NSumrKxKusWNStyrrGrKxeWpW9alYlVzsalblalYlajnY3K3GoxK1HLqOkrpG45xvy4dOvL5znxUnxX7E+eAAAAAAAAAAAAAAAAAAAAABAAFgAAKIKRYACqgoCEWCiCxIoixUiiLFFgyRSLFFixFgysUiwQiijIsIsEVYRYINJGhkiwWQRYsIsgyRqEiyDJFhI1IISLhI1IMpI1ISLIJaSKuLIMpI1ILIIYosEJFMVEMUxRExRRAURAUAUBAFQAVFAAVYixAVFZoqxFZaVUVmrFajMVitRqLGWoxWosaZiudajUVlYxW41FiLGK1GosZixixuNxYzFjnY3G4sZixzsbjUWMxWLGo2usarnY3K3KrEq6zY1K1q6zprFjWt6azpqeV1rV1jV1PK61prOmp5XW9NY1dTya3prGrqYut6azq6zYutausasrNjWtrrOrrFjUrUq6xq6zYsrerrMq6xY1K1K1rGrrNjUrerrGrrF5alblXWJVlc7GpXSVZWJWpWLG5W41KxGo5dR0ldI1GI3HDqOkdI35c/Lp5eP27cvnOfFSfFfsL58AAAAAAAAAAAAAAAAAAAAgAgqLAAAFARVSKAqRpUCCiEUIIsWI1BBYRRkaiRRFWEUQiiwZpGoiqirCRRkWQkaghIosGRqQkUQkaIsgzaSNSEiyDJI1ISLIISLIsijNpIshI1IJaSKRUZJFUEIqyKImNSGKMi4AgKAKCIKACgIARAVAFARVABYsSCCqis1VIkVKsWNMxWKrUWMxWa01FjLUYrUaisqxWo1FjMVitRpYy1HOtxpYysYrUaWMqxW43FjEVixqNyrrEq6xY3K3q6xq6xY1K1q6zprNi63prOms+Wtb01jV1MNa01nTTF1vTWdNTyutausKmGtausasrNi62azqs2Na3KrCysWNSt6usaus2LrWtSsaus2NSt6usausWNStyrrCysWNSt6srKysWNStyrGJVlYsaldJWo5ytSuVjcrpK1HOVqVy6jpK6yt+a5eXTy4dR15dPLr5cvLr4eL278vnOfFSfFfsD0AAAAAAAAAAAAAAAAAAAQAABBQAAEWKigoLBBQVCKKIKkURYpFghGkiwRYsFgyLCKIsUWQZJGkaghFkIqsjUIsglI1ISLBkaiRqIzSRqRJGpBDGpEjUGa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";
+
+/* Silhouette from the BUZ tool: two cubic-Bézier edges in a 1000x420 space. They are sampled
+   once into polylines and cut into five bands, one per stage. */
+const FUNNEL_W = 1000, FUNNEL_H = 420;
+const FUNNEL_TOP_NODES = [[0,8],[90,8],[170,22],[240,40],[320,53],[380,64],[440,74],[560,84],[640,91],[720,95],[820,104],[920,111],[1000,116]];
+const FUNNEL_BOT_NODES = [[0,412],[90,412],[170,398],[240,380],[320,367],[380,356],[440,346],[560,336],[640,329],[720,325],[820,316],[920,309],[1000,304]];
+const FUNNEL_SPLITS = [0,200,400,600,800,1000];
+function cubicAt(p0,p1,p2,p3,t){
+  const u = 1-t;
+  return [u*u*u*p0[0]+3*u*u*t*p1[0]+3*u*t*t*p2[0]+t*t*t*p3[0],
+          u*u*u*p0[1]+3*u*u*t*p1[1]+3*u*t*t*p2[1]+t*t*t*p3[1]];
+}
+function sampleEdge(nodes){
+  const out = [];
+  for(let seg=0; seg<(nodes.length-1)/3; seg++){
+    const i = seg*3;
+    for(let k=(seg?1:0); k<=40; k++) out.push(cubicAt(nodes[i],nodes[i+1],nodes[i+2],nodes[i+3],k/40));
+  }
+  return out;
+}
+const EDGE_TOP = sampleEdge(FUNNEL_TOP_NODES), EDGE_BOT = sampleEdge(FUNNEL_BOT_NODES);
+function edgeY(edge, x){
+  for(let j=1; j<edge.length; j++){
+    if(edge[j][0] >= x){
+      const a = edge[j-1], b = edge[j];
+      const t = (x-a[0])/((b[0]-a[0])||1);
+      return a[1] + t*(b[1]-a[1]);
+    }
+  }
+  return edge[edge.length-1][1];
+}
+function bandPolygon(i, samples=14){
+  const x0 = FUNNEL_SPLITS[i], x1 = FUNNEL_SPLITS[i+1], top = [], bot = [];
+  for(let k=0; k<samples; k++){
+    const x = x0 + (x1-x0)*k/(samples-1);
+    top.push([x, edgeY(EDGE_TOP,x)]);
+    bot.push([x, edgeY(EDGE_BOT,x)]);
+  }
+  return top.concat(bot.reverse());
+}
+/* Safe inner rectangle per band in % of the canvas. The funnel narrows to the right, so the
+   right edge of each band is its tightest point and sets the usable height. */
+const FUNNEL_BOUNDS = STATUS_ORDER.map((s,i)=>{
+  const x0 = FUNNEL_SPLITS[i], x1 = FUNNEL_SPLITS[i+1];
+  const top = edgeY(EDGE_TOP,x1), bot = edgeY(EDGE_BOT,x1), pad = 6;
+  return {left:x0/FUNNEL_W*100, width:(x1-x0)/FUNNEL_W*100, top:(top+pad)/FUNNEL_H*100, height:(bot-top-2*pad)/FUNNEL_H*100};
+});
+function funnelSvg(){
+  const d = pts=>'M'+pts.map(p=>p[0].toFixed(1)+','+p[1].toFixed(1)).join(' L')+' Z';
+  const bands = STATUS_ORDER.map((s,i)=>`<path d="${d(bandPolygon(i))}" fill="#${STAGE_HEX[s]}"/>`).join('');
+  const seams = [1,2,3,4].map(k=>{
+    const x = FUNNEL_SPLITS[k];
+    return `<line x1="${x}" y1="${edgeY(EDGE_TOP,x)}" x2="${x}" y2="${edgeY(EDGE_BOT,x)}" stroke="#ffffff" stroke-width="2.5"/>`;
+  }).join('');
+  const outline = `<path d="${d(EDGE_TOP.concat(EDGE_BOT.slice().reverse()))}" fill="none" stroke="rgba(11,40,56,0.35)" stroke-width="2"/>`;
+  return `<svg viewBox="0 0 ${FUNNEL_W} ${FUNNEL_H}" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">${bands}${seams}${outline}</svg>`;
+}
+
+let funnelScope = 'all';
+let funnelCat = '';
+function funnelScopeLabel(scope){
+  if(scope==='all') return 'All';
+  if(scope==='global') return 'Global';
+  const r = DATA.regions.find(x=>x.id===scope);
+  return r ? r.code : scope;
+}
+function funnelTitle(){ return funnelScope==='all' ? 'SPI Global Funnel' : funnelScopeLabel(funnelScope)+' Project Funnel'; }
+function funnelItemsAll(){
+  const out = [];
+  DATA.regions.forEach(r=>{
+    if(funnelScope!=='all' && funnelScope!==r.id) return;
+    r.projects.forEach(p=>out.push({p, id:p.id, title:p.name, rid:r.id, code:r.code, rname:r.name}));
+  });
+  if(funnelScope==='all' || funnelScope==='global'){
+    DATA.global.projects.forEach(p=>out.push({p, id:p.id, title:p.name, rid:'global', code:'GLOBAL', rname:'Global Coordinated Projects'}));
+  }
+  return out;
+}
+function funnelItems(){
+  const all = funnelItemsAll();
+  return funnelCat ? all.filter(x=>catInfo(x.p.classification).label===funnelCat) : all;
+}
+function funnelGroups(items){
+  return {
+    bands: STATUS_ORDER.map(s=>items.filter(x=>!x.p.archived && x.p.status===s)),
+    onHold: items.filter(x=>!x.p.archived && x.p.status==='On Hold'),
+    stopped: items.filter(x=>!x.p.archived && x.p.status==='Stopped'),
+    archived: items.filter(x=>x.p.archived)
+  };
+}
+/* Visual order — the same order the detail pages and the detail slides follow. */
+function funnelOrdered(g){ return [].concat(...g.bands, g.onHold, g.stopped, g.archived); }
+
+function ftokHtml(x, tone){
+  const ci = catInfo(x.p.classification);
+  const tip = `${x.title} · ${x.code}${x.p.classification?' · '+ci.label:''}`;
+  return `<div class="ftok ${tone||''}" data-fid="${x.id}" title="${escapeHtml(tip)}"><span>${escapeHtml(x.title)}</span>${tone?'':`<span class="fbadge" style="background:${ci.bg};color:${ci.fg}">${escapeHtml(ci.code)}</span>`}</div>`;
+}
+
+function renderFunnelTab(){
+  const itemsAll = funnelItemsAll();
+  const usedCats = Array.from(new Set(itemsAll.map(x=>catInfo(x.p.classification).label)));
+  if(funnelCat && !usedCats.includes(funnelCat)) funnelCat = '';
+  const items = funnelItems();
+  const g = funnelGroups(items);
+  const inFunnel = g.bands.reduce((n,b)=>n+b.length, 0);
+
+  let html = `<div class="section-title"><h2>Project Funnel</h2><span>tap a project to open its detail sheet</span></div>`;
+  html += `<div class="funnel-toolbar">
+    <div class="funnel-scope">${['all'].concat(ALL_STOPS).map(s=>`<div class="stop-pill${SITE_TEAM_IDS.includes(s)?' stop-pill-site':''} ${s===funnelScope?'active':''}" data-fscope="${s}">${funnelScopeLabel(s)}</div>`).join('')}</div>
+    <div class="funnel-actions">
+      <select id="funnelCatSel" aria-label="Filter by classification"><option value="">All classifications</option>${usedCats.map(c=>`<option value="${escapeHtml(c)}" ${c===funnelCat?'selected':''}>${escapeHtml(c)}</option>`).join('')}</select>
+      <button class="fbtn" id="funnelPptxBtn">PowerPoint</button>
+      <button class="fbtn" id="funnelPdfBtn">PDF</button>
+    </div>
+  </div>`;
+  html += `<div class="funnel-stats">${[['Projects',items.length],['Active in funnel',inFunnel],['On hold / stopped',g.onHold.length+g.stopped.length],['Archived',g.archived.length]].map(s=>`<div class="fstat"><b>${s[1]}</b><small>${s[0]}</small></div>`).join('')}</div>`;
+
+  const legendCats = Array.from(new Set(items.map(x=>catInfo(x.p.classification).label))).map(l=>catInfo(l==='Unclassified'?'':l));
+  html += `<div class="funnel-capture" id="funnelCapture">
+    <div class="funnel-lbls">${STATUS_ORDER.map((s,i)=>`<div style="left:${FUNNEL_BOUNDS[i].left}%;width:${FUNNEL_BOUNDS[i].width}%">${s}</div>`).join('')}</div>
+    <div class="funnel-canvas" id="funnelCanvas">${funnelSvg()}${STATUS_ORDER.map((s,i)=>{
+      const b = FUNNEL_BOUNDS[i];
+      return `<div class="fstage" style="left:${b.left}%;top:${b.top}%;width:${b.width}%;height:${b.height}%"><div class="fstage-inner">${g.bands[i].length ? g.bands[i].map(x=>ftokHtml(x)).join('') : '<span class="fempty">–</span>'}</div></div>`;
+    }).join('')}</div>
+    <div class="funnel-side">${[['On hold',g.onHold,'gray'],['Stopped',g.stopped,'gray'],['Archived',g.archived,'dark']].map(([label,list,tone])=>`<div class="fside"><h4>${label}</h4><div class="fside-wrap">${list.length ? list.map(x=>ftokHtml(x,tone)).join('') : '<span class="fempty">–</span>'}</div></div>`).join('')}</div>
+    ${legendCats.length ? `<div class="funnel-legend"><b>Classification</b>${legendCats.map(ci=>`<span><i class="catdot" style="background:${ci.bg};color:${ci.fg}">${escapeHtml(ci.code)}</i>${escapeHtml(ci.label)}</span>`).join('')}</div>` : ''}
+  </div>`;
+
+  document.getElementById('container').innerHTML = html;
+  document.querySelectorAll('[data-fscope]').forEach(el=>el.addEventListener('click', ()=>{ funnelScope = el.getAttribute('data-fscope'); renderFunnelTab(); }));
+  document.getElementById('funnelCatSel').addEventListener('change', e=>{ funnelCat = e.target.value; renderFunnelTab(); });
+  document.getElementById('funnelPptxBtn').addEventListener('click', e=>runExport(e.currentTarget, exportFunnelPptx));
+  document.getElementById('funnelPdfBtn').addEventListener('click', e=>runExport(e.currentTarget, exportFunnelPdf));
+  document.querySelectorAll('.ftok[data-fid]').forEach(el=>el.addEventListener('click', ()=>openFunnelDetail(el.getAttribute('data-fid'))));
+  requestAnimationFrame(()=>{
+    fitFunnelTokens(g);
+    document.querySelectorAll('#funnelCanvas .fstage-inner').forEach(el=>trimFunnelOverflow(el));
+  });
+}
+
+/* Token size adapts to the project count: the largest diameter at which every band still fits
+   its projects, taken over all bands so all tokens stay the same size. */
+const FTOK_MAX = 88, FTOK_MIN = 34, FTOK_GAP = 6;
+function fitDiameter(w, h, n){
+  if(n<=0) return FTOK_MAX;
+  for(let d=FTOK_MAX; d>=FTOK_MIN; d--){
+    const cols = Math.max(1, Math.floor((w+FTOK_GAP)/(d+FTOK_GAP)));
+    if(Math.ceil(n/cols)*(d+FTOK_GAP)-FTOK_GAP <= h) return d;
+  }
+  return FTOK_MIN;
+}
+function fitFunnelTokens(g){
+  const canvas = document.getElementById('funnelCanvas');
+  const cap = document.getElementById('funnelCapture');
+  if(!canvas || !cap || !canvas.clientWidth) return;
+  let d = FTOK_MAX;
+  STATUS_ORDER.forEach((s,i)=>{
+    const b = FUNNEL_BOUNDS[i];
+    d = Math.min(d, fitDiameter(canvas.clientWidth*b.width/100-10, canvas.clientHeight*b.height/100-8, g.bands[i].length));
+  });
+  cap.querySelectorAll('.fside-wrap').forEach(el=>{
+    const n = el.querySelectorAll('.ftok').length;
+    if(n) d = Math.min(d, fitDiameter(el.clientWidth-4, FTOK_MAX*2, n));
+  });
+  const st = cap.style;
+  st.setProperty('--ftokD', d+'px');
+  st.setProperty('--ftokF', Math.max(6.5, Math.min(10.5, d*0.118)).toFixed(1)+'px');
+  st.setProperty('--ftokP', Math.max(3, Math.round(d*0.10))+'px');
+  st.setProperty('--fbadgeD', Math.max(14, Math.round(d*0.26))+'px');
+  st.setProperty('--fbadgeF', Math.max(6.5, d*0.105).toFixed(1)+'px');
+}
+/* If a band still can't show everything at the minimum size, the tail becomes one "+N" token
+   so nothing is silently cut off. */
+function trimFunnelOverflow(el){
+  let hidden = 0, guard = 0;
+  while(el.scrollHeight > el.clientHeight+2 && el.querySelectorAll('.ftok').length>1 && guard++<200){
+    el.querySelector('.ftok:last-of-type').remove();
+    hidden++;
+  }
+  if(hidden>0){
+    const last = el.querySelector('.ftok:last-of-type');
+    if(last) last.remove();
+    el.insertAdjacentHTML('beforeend', `<div class="ftok more" title="${hidden+1} more projects">+${hidden+1}</div>`);
+  }
+}
+window.addEventListener('resize', ()=>{
+  clearTimeout(window._funnelResizeT);
+  window._funnelResizeT = setTimeout(()=>{ if(currentTab==='funnel' && DATA) renderFunnelTab(); }, 180);
+});
+
+/* ---- Detail sheet (same structure as the PowerPoint detail slides) ---- */
+let funnelDetailList = [], funnelDetailIdx = 0;
+function openFunnelDetail(id){
+  funnelDetailList = funnelOrdered(funnelGroups(funnelItems()));
+  funnelDetailIdx = Math.max(0, funnelDetailList.findIndex(x=>x.id===id));
+  renderFunnelDetail();
+}
+function closeFunnelDetail(){ const o = document.getElementById('fdOverlay'); if(o) o.remove(); }
+function stepFunnelDetail(dir){
+  if(!funnelDetailList.length) return;
+  funnelDetailIdx = (funnelDetailIdx + dir + funnelDetailList.length) % funnelDetailList.length;
+  renderFunnelDetail();
+}
+function funnelBox(title, body, stripe){
+  return `<div class="fd-box" style="border-left-color:#${stripe}"><h4>${title}</h4><p>${escapeHtml(body)||'—'}</p></div>`;
+}
+function renderFunnelDetail(){
+  closeFunnelDetail();
+  const x = funnelDetailList[funnelDetailIdx];
+  if(!x) return;
+  const p = x.p, ci = catInfo(p.classification), sc = STAGE_HEX[p.status] || '8A94A6';
+  const pipe = STATUS_ALL.map(s=>{
+    const on = s===p.status;
+    return `<span class="${on?'on':''}" style="${on?`background:#${STAGE_HEX[s]};color:${STATUS_DARK_TEXT[s]?'var(--ink)':'#fff'}`:''}">${s}</span>`;
+  }).join('');
+  const prev = funnelDetailList[(funnelDetailIdx-1+funnelDetailList.length)%funnelDetailList.length];
+  const next = funnelDetailList[(funnelDetailIdx+1)%funnelDetailList.length];
+  const canEdit = x.rid==='global' || !currentUser || isRegionAllowed(x.rid, currentUser);
+  const overlay = document.createElement('div');
+  overlay.id = 'fdOverlay';
+  overlay.className = 'fd-overlay';
+  overlay.innerHTML = `<div class="fd-sheet" role="dialog" aria-label="${escapeHtml(x.title)}">
+    <div class="fd-head" style="background-image:url('${BRAND_GRADIENT}')"><h2>${escapeHtml(x.title)}</h2><img src="${BRAND_LOGO}" alt="Bühler"></div>
+    <div class="fd-sub"><span>SPI Global Exchange · ${escapeHtml(x.rname)}${p.archived?' · archived':''}</span>
+      <span class="fd-chip"><i class="catdot" style="background:${ci.bg};color:${ci.fg}">${escapeHtml(ci.code)}</i>${escapeHtml(ci.label)}</span></div>
+    <div class="fd-pipe">${pipe}</div>
+    <div class="fd-grid">
+      <div class="fd-col">${funnelBox('Problem / starting point',p.problem,sc)}${funnelBox('Goal / benefit',p.benefit,sc)}${funnelBox('Next steps / remarks',p.nextSteps,sc)}${funnelBox('Notes',p.notes.trim(),sc)}</div>
+      <div class="fd-col">${funnelBox('Project lead',p.lead,sc)}${funnelBox('Region',x.rname,sc)}${funnelBox('Team members involved',p.team,sc)}${funnelBox('External partners',p.partners,sc)}</div>
+    </div>
+    <div class="fd-nav">
+      <button class="fbtn" data-fd="close">← Back to funnel</button>
+      <span class="mono" style="font-size:12px;color:var(--ink-soft)">${funnelDetailIdx+1} of ${funnelDetailList.length}</span>
+      <span style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="fbtn" data-fd="prev">‹ ${escapeHtml(prev.title.slice(0,24))}</button>
+        <button class="fbtn" data-fd="next">${escapeHtml(next.title.slice(0,24))} ›</button>
+        ${canEdit?'<button class="fbtn" data-fd="edit">Edit in Exchange Mode</button>':''}
+      </span>
+    </div>
+    <div class="fd-foot" style="background-image:url('${BRAND_GRADIENT}')"></div>
+  </div>`;
+  overlay.addEventListener('click', e=>{ if(e.target===overlay) closeFunnelDetail(); });
+  overlay.querySelector('[data-fd="close"]').addEventListener('click', closeFunnelDetail);
+  overlay.querySelector('[data-fd="prev"]').addEventListener('click', ()=>stepFunnelDetail(-1));
+  overlay.querySelector('[data-fd="next"]').addEventListener('click', ()=>stepFunnelDetail(1));
+  const editBtn = overlay.querySelector('[data-fd="edit"]');
+  if(editBtn) editBtn.addEventListener('click', ()=>{ closeFunnelDetail(); openDetailSections.add(x.id); goToStop(x.rid); });
+  document.body.appendChild(overlay);
+}
+document.addEventListener('keydown', e=>{
+  if(!document.getElementById('fdOverlay')) return;
+  if(e.key==='Escape') closeFunnelDetail();
+  else if(e.key==='ArrowRight') stepFunnelDetail(1);
+  else if(e.key==='ArrowLeft') stepFunnelDetail(-1);
+});
+
+/* ---- Exports ---- */
+const PPTX_SRC = 'https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js';
+const H2C_SRC = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+const JSPDF_SRC = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+const _scriptLoads = {};
+function loadScriptOnce(src){
+  if(!_scriptLoads[src]){
+    _scriptLoads[src] = new Promise((resolve, reject)=>{
+      const s = document.createElement('script');
+      s.src = src;
+      s.onload = resolve;
+      s.onerror = ()=>{ delete _scriptLoads[src]; reject(new Error('Could not load '+src.split('/').pop()+' — check your network connection and try again.')); };
+      document.head.appendChild(s);
+    });
+  }
+  return _scriptLoads[src];
+}
+async function runExport(btn, fn){
+  const label = btn.textContent;
+  btn.disabled = true; btn.textContent = 'Preparing…';
+  try{ await fn(); }
+  catch(e){ console.error('Export failed', e); alert('Export failed: '+(e && e.message || e)); }
+  finally{ btn.disabled = false; btn.textContent = label; }
+}
+function exportFileName(ext){
+  const scope = funnelScope==='all' ? 'All' : funnelScopeLabel(funnelScope);
+  const cat = funnelCat ? '_'+funnelCat.replace(/[^A-Za-z0-9]+/g,'_') : '';
+  return 'SPI_Funnel_'+scope+cat+'.'+ext;
+}
+
+async function exportFunnelPdf(){
+  await loadScriptOnce(H2C_SRC);
+  await loadScriptOnce(JSPDF_SRC);
+  const canvas = await html2canvas(document.getElementById('funnelCapture'), {backgroundColor:'#ffffff', scale:3, useCORS:true});
+  const {jsPDF} = window.jspdf;
+  const pdf = new jsPDF({orientation:'landscape', unit:'pt', format:'a4'});
+  const pageW = pdf.internal.pageSize.getWidth(), pageH = pdf.internal.pageSize.getHeight();
+  pdf.addImage(BRAND_GRADIENT, 'JPEG', 0, 0, pageW, 58);
+  pdf.setTextColor('#ffffff'); pdf.setFont('helvetica','bold'); pdf.setFontSize(18);
+  pdf.text(funnelTitle(), 28, 32);
+  pdf.setFont('helvetica','normal'); pdf.setFontSize(10);
+  pdf.text(funnelCat ? 'Classification: '+funnelCat : 'Smart Production & Innovation · ideas to scale', 28, 47);
+  pdf.addImage(BRAND_LOGO, 'PNG', pageW-28-96, 20, 96, 18.6);
+  const marginX = 28, topY = 76, bottom = 34;
+  const availW = pageW-marginX*2, availH = pageH-topY-bottom;
+  const ratio = Math.min(availW/canvas.width, availH/canvas.height);
+  const w = canvas.width*ratio, h = canvas.height*ratio;
+  pdf.addImage(canvas.toDataURL('image/png'), 'PNG', (pageW-w)/2, topY+(availH-h)/2, w, h, undefined, 'FAST');
+  pdf.setDrawColor('#d6e4e4'); pdf.line(marginX, pageH-22, pageW-marginX, pageH-22);
+  pdf.setTextColor('#5c7a88'); pdf.setFontSize(8.5);
+  pdf.text('Bühler AG · SPI Global Exchange', marginX, pageH-11);
+  pdf.text('Exported '+new Date().toLocaleString('en-GB'), pageW-marginX, pageH-11, {align:'right'});
+  pdf.save(exportFileName('pdf'));
+}
+
+async function buildFunnelPptx(){
+  await loadScriptOnce(PPTX_SRC);
+  const g = funnelGroups(funnelItems());
+  const pptx = new PptxGenJS();
+  pptx.defineLayout({name:'WIDE', width:13.33, height:7.5});
+  pptx.layout = 'WIDE';
+  await pptDefineMasters(pptx);
+  pptOverviewSlide(pptx, g);
+  funnelOrdered(g).forEach(x=>pptDetailSlide(pptx, x));
+  return pptx;
+}
+async function exportFunnelPptx(){
+  const pptx = await buildFunnelPptx();
+  await pptx.writeFile({fileName: exportFileName('pptx'), compression:true});
+}
+
+/* Same header band on every slide: brand gradient, white title, logo on the right. The
+   gradient and logo live on two slide masters so the file stores them once, not per slide —
+   the band images are cropped to the exact band shape here because masters can't crop. */
+const PPT_HEADER_H = 0.78, PPT_FOOTER_Y = 7.34, PPT_FOOTER_H = 0.16;
+function cropCover(src, aspect){
+  return new Promise((resolve, reject)=>{
+    const img = new Image();
+    img.onload = ()=>{
+      let sw = img.width, sh = Math.round(img.width/aspect);
+      if(sh > img.height){ sh = img.height; sw = Math.round(sh*aspect); }
+      const c = document.createElement('canvas');
+      c.width = sw; c.height = sh;
+      c.getContext('2d').drawImage(img, (img.width-sw)/2, (img.height-sh)/2, sw, sh, 0, 0, sw, sh);
+      resolve(c.toDataURL('image/jpeg', 0.9));
+    };
+    img.onerror = ()=>reject(new Error('Could not prepare the brand gradient'));
+    img.src = src;
+  });
+}
+async function pptDefineMasters(pptx){
+  const band = await cropCover(BRAND_GRADIENT, 13.33/PPT_HEADER_H);
+  const strip = await cropCover(BRAND_GRADIENT, 13.33/PPT_FOOTER_H);
+  const logoH = 1.32*120/620;
+  const header = [
+    {image:{x:0, y:0, w:13.33, h:PPT_HEADER_H, data:band}},
+    {image:{x:11.62, y:PPT_HEADER_H/2-logoH/2, w:1.32, h:logoH, data:BRAND_LOGO}}
+  ];
+  pptx.defineSlideMaster({title:'SPI_OVERVIEW', background:{color:'FFFFFF'}, objects:header});
+  pptx.defineSlideMaster({title:'SPI_DETAIL', background:{color:'FFFFFF'}, objects:header.concat([
+    {image:{x:0, y:PPT_FOOTER_Y, w:13.33, h:PPT_FOOTER_H, data:strip}},
+    {text:{text:'Bühler AG · SPI Global Exchange', options:{x:0.4, y:7.1, w:8, h:0.2, fontSize:8, color:'8AA0AC'}}}
+  ])});
+}
+function pptHeader(slide, title){
+  slide.addText(String(title||''), {x:0.45, y:0.1, w:10.6, h:PPT_HEADER_H-0.2, fontSize:22, bold:true, color:'FFFFFF', valign:'middle', fit:'shrink'});
+}
+/* Native funnel band: the sampled polygon as a custom shape, points in EMU relative to its box. */
+function pptBand(slide, i, fx, fy, fw, fh){
+  const EMU = 914400, pts = bandPolygon(i, 14);
+  const x0 = FUNNEL_SPLITS[i], w = FUNNEL_SPLITS[i+1]-x0;
+  const shapeX = fx+fw*(x0/FUNNEL_W), shapeW = fw*(w/FUNNEL_W);
+  const ys = pts.map(p=>p[1]), yMin = Math.min(...ys), yMax = Math.max(...ys);
+  const shapeY = fy+fh*(yMin/FUNNEL_H), shapeH = fh*((yMax-yMin)/FUNNEL_H);
+  const points = pts.map(p=>({x:Math.round(((p[0]-x0)/w)*shapeW*EMU), y:Math.round(((p[1]-yMin)/(yMax-yMin))*shapeH*EMU)}));
+  slide.addShape('custGeom', {x:shapeX, y:shapeY, w:shapeW, h:shapeH, fill:{color:STAGE_HEX[STATUS_ORDER[i]]}, line:{type:'none'}, points});
+}
+const PPT_CIRCLE_MAX = 0.86, PPT_CIRCLE_MIN = 0.44, PPT_CIRCLE_GAP = 0.07;
+let PPT_CIRCLE_D = 0.72;
+function pptFitCircleD(w, h, n){
+  if(n<=0) return PPT_CIRCLE_MAX;
+  for(let d=PPT_CIRCLE_MAX; d>=PPT_CIRCLE_MIN; d-=0.01){
+    const cols = Math.max(1, Math.floor((w+PPT_CIRCLE_GAP)/(d+PPT_CIRCLE_GAP)));
+    if(Math.ceil(n/cols)*(d+PPT_CIRCLE_GAP)-PPT_CIRCLE_GAP <= h) return Math.round(d*100)/100;
+  }
+  return PPT_CIRCLE_MIN;
+}
+function pptCircleRows(n, w){ const cols = Math.max(1, Math.floor((w+PPT_CIRCLE_GAP)/(PPT_CIRCLE_D+PPT_CIRCLE_GAP))); return Math.max(1, Math.ceil(n/cols)); }
+/* Text width estimate in inches; wide and narrow glyphs are told apart so line breaks hold. */
+function pptTxtWidth(s, fs){
+  let u = 0;
+  for(const ch of String(s)){
+    if(/[mMwW@—]/.test(ch)) u += 0.88;
+    else if(/[iljItf1.,;:'"!\[\]()|\/ ]/.test(ch)) u += 0.31;
+    else if(/[A-Z0-9ÄÖÜ]/.test(ch)) u += 0.63;
+    else u += 0.53;
+  }
+  return u*fs/72;
+}
+function pptWrapTokens(t){
+  const out = [];
+  t.split(/\s+/).filter(Boolean).forEach(word=>{
+    word.split(/(?<=[-\/])/).forEach((part,pi)=>out.push({s:part, glue:pi>0}));
+  });
+  return out;
+}
+/* Break a word as late as possible, preferably between two consonants before a vowel,
+   otherwise before a single consonant between two vowels. */
+const PPT_VOWEL = /[aeiouäöüyAEIOUÄÖÜY]/;
+function pptHyphenAt(w, fs, maxW){
+  let hi = w.length-1;
+  while(hi>2 && pptTxtWidth(w.slice(0,hi)+'-', fs) > maxW) hi--;
+  if(hi<=2) return 0;
+  const top = Math.min(hi, w.length-3), V = i=>PPT_VOWEL.test(w[i]), C = i=>!PPT_VOWEL.test(w[i]);
+  let c1 = 0; for(let i=top; i>=3; i--) if(C(i-1)&&C(i)&&V(i+1)){ c1 = i; break; }
+  let c2 = 0; for(let i=top; i>=3; i--) if(V(i-1)&&C(i)&&V(i+1)){ c2 = i; break; }
+  if(c1||c2) return Math.max(c1,c2);
+  for(let i=top; i>=3; i--) if(V(i-1)&&C(i)) return i;
+  return hi;
+}
+function pptLayoutLines(tokens, fs, maxW){
+  const lines = []; let cur = '';
+  for(const tk of tokens){
+    const test = cur ? (tk.glue ? cur+tk.s : cur+' '+tk.s) : tk.s;
+    if(pptTxtWidth(test, fs) <= maxW){ cur = test; continue; }
+    if(cur){ lines.push(cur); cur = ''; }
+    let w = tk.s;
+    while(pptTxtWidth(w, fs) > maxW){
+      const i = pptHyphenAt(w, fs, maxW);
+      if(!i) return null;
+      lines.push(w.slice(0,i)+'-'); w = w.slice(i);
+    }
+    cur = w;
+  }
+  if(cur) lines.push(cur);
+  return lines;
+}
+/* Wrap the title ourselves and pick the largest font at which every line fits the token. */
+function pptFitCircleText(title, d){
+  const t = String(title||'').trim();
+  if(!t) return {text:'', size:8};
+  const maxW = d*0.76, maxH = d*0.70, tokens = pptWrapTokens(t);
+  const fsStart = Math.max(6, Math.min(14, Math.round(d*15*2)/2));
+  let clean = null, any = null;
+  for(let fs=fsStart; fs>=5; fs-=0.5){
+    const lh = fs*1.16/72;
+    const lines = pptLayoutLines(tokens, fs, maxW);
+    if(!lines || lines.length*lh > maxH) continue;
+    const noBreak = !tokens.some(tk=>pptTxtWidth(tk.s, fs) > maxW);
+    if(!any) any = {text:lines.join('\n'), size:fs};
+    if(noBreak){ clean = {text:lines.join('\n'), size:fs}; break; }
+  }
+  const best = (clean && (!any || any.size-clean.size < 1.5)) ? clean : (any || clean);
+  if(best) return best;
+  const fs = 5, lh = fs*1.16/72, maxLines = Math.max(1, Math.floor(maxH/lh));
+  const lines = (pptLayoutLines(tokens, fs, maxW) || [t]).slice(0, maxLines);
+  if(lines.length===maxLines) lines[maxLines-1] = lines[maxLines-1].replace(/-$/,'')+'…';
+  return {text:lines.join('\n'), size:fs};
+}
+/* Equal-size teardrop tokens in a centred grid; overflow collapses into one "+N" token. */
+function pptCircles(slide, items, x, y, w, style, availH){
+  const d = PPT_CIRCLE_D, gap = PPT_CIRCLE_GAP, n = items.length;
+  if(!n) return 0;
+  const cols = Math.max(1, Math.floor((w+gap)/(d+gap)));
+  const maxRows = availH ? Math.max(1, Math.floor((availH+gap)/(d+gap))) : Infinity;
+  const capacity = cols*maxRows;
+  let shown = items, plus = 0;
+  if(n>capacity){ shown = items.slice(0, capacity-1); plus = n-(capacity-1); }
+  const total = shown.length + (plus>0?1:0);
+  const rows = Math.ceil(total/cols);
+  const neededH = rows*(d+gap)-gap;
+  const startY = y + (availH ? Math.max(0, (availH-neededH)/2) : 0);
+  for(let row=0; row<rows; row++){
+    const rowStart = row*cols, rowCount = Math.min(cols, total-rowStart);
+    const rowX = x + (w-(rowCount*(d+gap)-gap))/2;
+    for(let col=0; col<rowCount; col++){
+      const idx = rowStart+col;
+      const cx = rowX+col*(d+gap)+d/2, cy = startY+row*(d+gap)+d/2;
+      if(idx<shown.length){
+        const it = shown[idx], ci = catInfo(it.p.classification);
+        const fill = style==='gray' ? 'CFCFC6' : style==='dark' ? '0B3948' : 'FFFFFF';
+        const txt = style==='dark' ? 'FFFFFF' : '0B3948';
+        slide.addShape('teardrop', {x:cx-d/2, y:cy-d/2, w:d, h:d, rotate:270, fill:{color:fill}, line:style?{type:'none'}:{color:'D6E4E4', width:.5}});
+        const ft = pptFitCircleText(it.title, d);
+        slide.addText(ft.text, {x:cx-d/2+0.04, y:cy-d/2+0.04, w:d-0.08, h:d-0.08, fontSize:ft.size, align:'center', valign:'middle', color:txt, wrap:false, lineSpacingMultiple:0.96});
+        if(!style){
+          const bd = Math.max(0.15, Math.min(0.22, d*0.28));
+          slide.addShape('ellipse', {x:cx+d/2-bd*0.85, y:cy+d/2-bd*0.85, w:bd, h:bd, fill:{color:ci.bgHex}, line:{color:'FFFFFF', width:1}});
+          slide.addText(ci.code, {x:cx+d/2-bd*0.85, y:cy+d/2-bd*0.85, w:bd, h:bd, fontSize:Math.max(5, Math.min(7.5, bd*33)), bold:true, align:'center', valign:'middle', color:ci.fgHex, wrap:false});
+        }
+      }else{
+        const fill = style==='gray' ? 'CFCFC6' : style==='dark' ? '0B3948' : 'E4F0EF';
+        slide.addShape('teardrop', {x:cx-d/2, y:cy-d/2, w:d, h:d, rotate:270, fill:{color:fill}, line:{color:'A8C7D2', width:.75}});
+        slide.addText('+'+plus, {x:cx-d/2, y:cy-d/2, w:d, h:d, fontSize:9, bold:true, align:'center', valign:'middle', color:style==='dark'?'FFFFFF':'0B3948'});
+      }
+    }
+  }
+  return neededH;
+}
+function pptPlanLegend(items, legW){
+  const cats = Array.from(new Set(items.map(x=>catInfo(x.p.classification).label))).map(l=>catInfo(l==='Unclassified'?'':l));
+  const padX = 0.16, padY = 0.13, rowH = 0.26, badge = 0.19, gapX = 0.3, titleH = 0.24;
+  if(!cats.length) return {cats, rows:0, cols:0, colW:0, h:0.34, padX, padY, rowH, badge, titleH};
+  const colW = Math.max(...cats.map(ci=>badge+0.08+pptTxtWidth(ci.label, 9))) + gapX;
+  const avail = legW-padX*2;
+  const cols = Math.max(1, Math.min(cats.length, Math.floor(avail/colW)));
+  const rows = Math.ceil(cats.length/cols);
+  return {cats, rows, cols, colW:avail/cols, h:padY*2+titleH+rows*rowH, padX, padY, rowH, badge, titleH};
+}
+function pptLegend(slide, p, fx, legY, legW){
+  slide.addShape('roundRect', {x:fx, y:legY, w:legW, h:p.h, rectRadius:0.06, fill:{color:'FBFCFD'}, line:{color:'D6E4E4', width:1}});
+  slide.addText('Classification', {x:fx+p.padX, y:legY+p.padY, w:legW-p.padX*2, h:p.titleH, fontSize:9.5, bold:true, color:'0B3948', valign:'middle'});
+  p.cats.forEach((ci,i)=>{
+    const r = Math.floor(i/p.cols), c = i%p.cols;
+    const x = fx+p.padX+c*p.colW, y = legY+p.padY+p.titleH+r*p.rowH;
+    slide.addShape('ellipse', {x, y:y+(p.rowH-p.badge)/2, w:p.badge, h:p.badge, fill:{color:ci.bgHex}, line:{type:'none'}});
+    slide.addText(ci.code, {x, y:y+(p.rowH-p.badge)/2, w:p.badge, h:p.badge, fontSize:6.5, bold:true, align:'center', valign:'middle', color:ci.fgHex, wrap:false});
+    slide.addText(ci.label, {x:x+p.badge+0.07, y, w:p.colW-p.badge-0.12, h:p.rowH, fontSize:9, color:'122229', valign:'middle', wrap:false});
+  });
+}
+/* Plan bottom-up: legend and holding boxes are measured first, the funnel gets the rest. */
+function pptOverviewSlide(pptx, g){
+  const slide = pptx.addSlide({masterName:'SPI_OVERVIEW'});
+  pptHeader(slide, funnelTitle());
+  if(funnelCat) slide.addText('Classification: '+funnelCat, {x:0.45, y:PPT_HEADER_H+0.02, w:8, h:0.22, fontSize:9, color:'5C7A88'});
+  const fx = 0.4, fy = 1.15, fw = 12.5, SLIDE_H = 7.5;
+  const all = funnelOrdered(g);
+  const legendPlan = pptPlanLegend(all, fw);
+  const boxW = 4.05, boxGap = 0.14, boxPadTop = 0.17, boxPadBottom = 0.04;
+  const boxGroups = [['On hold',g.onHold,'gray'],['Stopped',g.stopped,'gray'],['Archived',g.archived,'dark']];
+  const fhGuess = Math.max(2.4, SLIDE_H-0.28-fy-0.16-1.0-0.14-legendPlan.h);
+  PPT_CIRCLE_D = Math.min(
+    ...STATUS_ORDER.map((s,i)=>pptFitCircleD(fw*(FUNNEL_BOUNDS[i].width/100)-0.28, fhGuess*(FUNNEL_BOUNDS[i].height/100)-0.2, g.bands[i].length)),
+    ...boxGroups.map(([,list])=>list.length ? pptFitCircleD(boxW-0.2, 1.5, list.length) : PPT_CIRCLE_MAX)
+  );
+  const boxH = Math.max(0.44, ...boxGroups.map(([,list])=>list.length ? boxPadTop+pptCircleRows(list.length, boxW-0.2)*(PPT_CIRCLE_D+PPT_CIRCLE_GAP)-PPT_CIRCLE_GAP+boxPadBottom : boxPadTop+0.08));
+  const fh = Math.max(2.4, SLIDE_H-0.28-fy-0.16-boxH-0.14-legendPlan.h);
+  STATUS_ORDER.forEach((s,i)=>{
+    const b = FUNNEL_BOUNDS[i];
+    slide.addText(s, {x:fx+fw*(b.left/100)+0.05, y:fy-0.3, w:fw*(b.width/100)-0.1, h:0.24, fontSize:12, bold:true, color:'0B3948'});
+    pptBand(slide, i, fx, fy, fw, fh);
+    pptCircles(slide, g.bands[i], fx+fw*(b.left/100)+0.14, fy+fh*(b.top/100)+0.1, fw*(b.width/100)-0.28, null, fh*(b.height/100)-0.2);
+  });
+  const boxY = fy+fh+0.16;
+  boxGroups.forEach(([label,list,style],i)=>{
+    const x = fx+i*(boxW+boxGap);
+    slide.addShape('roundRect', {x, y:boxY, w:boxW, h:boxH, rectRadius:0.06, fill:{color:'FBFCFD'}, line:{color:'D8E3E8', width:1}});
+    slide.addText(label, {x:x+0.1, y:boxY+0.035, w:boxW-0.2, h:0.16, fontSize:8.5, bold:true, color:'0B3948'});
+    if(list.length) pptCircles(slide, list, x+0.1, boxY+boxPadTop, boxW-0.2, style, boxH-boxPadTop-boxPadBottom);
+  });
+  pptLegend(slide, legendPlan, fx, boxY+boxH+0.14, boxW*3+boxGap*2);
+}
+function pptDetailSlide(pptx, x){
+  const p = x.p, slide = pptx.addSlide({masterName:'SPI_DETAIL'});
+  const ci = catInfo(p.classification), sc = STAGE_HEX[p.status] || '8A94A6';
+  pptHeader(slide, x.title);
+  slide.addText('SPI Global Exchange · '+x.rname+(p.archived?' · archived':''), {x:0.4, y:0.88, w:7.5, h:0.26, fontSize:10.5, color:'5C7A88', valign:'middle'});
+  const chipW = 0.34+pptTxtWidth(ci.label,10)+0.2, chipX = 12.9-chipW;
+  slide.addShape('roundRect', {x:chipX, y:0.88, w:chipW, h:0.26, rectRadius:0.13, fill:{color:'F2F7F7'}, line:{color:'D6E4E4', width:.75}});
+  slide.addShape('ellipse', {x:chipX+0.05, y:0.905, w:0.21, h:0.21, fill:{color:ci.bgHex}, line:{type:'none'}});
+  slide.addText(ci.code, {x:chipX+0.05, y:0.905, w:0.21, h:0.21, fontSize:7, bold:true, align:'center', valign:'middle', color:ci.fgHex, wrap:false});
+  slide.addText(ci.label, {x:chipX+0.3, y:0.88, w:chipW-0.36, h:0.26, fontSize:10, color:'122229', valign:'middle', wrap:false});
+  const pipeW = 12.5, segW = pipeW/STATUS_ALL.length, pipeY = 1.28, pipeH = 0.34;
+  STATUS_ALL.forEach((s,i)=>{
+    const on = s===p.status;
+    slide.addShape('roundRect', {x:0.4+i*segW, y:pipeY, w:segW-0.07, h:pipeH, rectRadius:0.06, fill:{color:on?STAGE_HEX[s]:'EEF4F4'}, line:{type:'none'}});
+    slide.addText(s, {x:0.4+i*segW, y:pipeY, w:segW-0.07, h:pipeH, fontSize:8, bold:on, align:'center', valign:'middle', color:on?(STATUS_DARK_TEXT[s]?'122229':'FFFFFF'):'5C7A88'});
+  });
+  const colY = 1.94, leftX = 0.4, leftW = 7.05, rightX = 7.68, rightW = 5.22, gap = 0.14, bottomY = 7.06;
+  function box(x0, y0, w0, h0, title, body, fs){
+    slide.addShape('roundRect', {x:x0, y:y0, w:w0, h:h0, rectRadius:0.07, fill:{color:'FBFCFD'}, line:{color:'D6E4E4', width:1}});
+    slide.addShape('roundRect', {x:x0, y:y0+0.04, w:0.055, h:h0-0.08, rectRadius:0.03, fill:{color:sc}, line:{type:'none'}});
+    slide.addText(String(title).toUpperCase(), {x:x0+0.18, y:y0+0.07, w:w0-0.32, h:0.2, fontSize:8.5, bold:true, color:'0B3948', charSpacing:0.6});
+    slide.addText((body||'').trim()||'—', {x:x0+0.18, y:y0+0.29, w:w0-0.34, h:h0-0.38, fontSize:fs||10, color:'122229', valign:'top', fit:'shrink'});
+  }
+  const rows = 4, h = (bottomY-colY-(rows-1)*gap)/rows;
+  [['Problem / starting point',p.problem],['Goal / benefit',p.benefit],['Next steps / remarks',p.nextSteps],['Notes',p.notes]]
+    .forEach(([t,v],i)=>box(leftX, colY+i*(h+gap), leftW, h, t, v));
+  [['Project lead',p.lead],['Region',x.rname],['Team members involved',p.team],['External partners',p.partners]]
+    .forEach(([t,v],i)=>box(rightX, colY+i*(h+gap), rightW, h, t, v, 9.5));
+}
+
 /* ---------------- Nav / shell ---------------- */
 function setActiveNav(tab){
   document.querySelectorAll('#mainNav button').forEach(b=>{
@@ -1538,6 +2291,7 @@ function setActiveNav(tab){
 
 function renderTab(){
   if(currentTab==='dashboard') renderDashboard();
+  else if(currentTab==='funnel') renderFunnelTab();
   else if(currentTab==='prep') renderPrep();
   else if(currentTab==='exchange') renderExchange();
   else if(currentTab==='tasks') renderTasks();
@@ -1548,7 +2302,7 @@ document.getElementById('mainNav').addEventListener('click', async (e)=>{
   const btn = e.target.closest('button[data-tab]');
   if(!btn) return;
   const tab = btn.getAttribute('data-tab');
-  if(tab !== 'dashboard'){
+  if(tab !== 'dashboard' && tab !== 'funnel'){
     const user = await getCurrentUser();
     if(!user) return;
   }
