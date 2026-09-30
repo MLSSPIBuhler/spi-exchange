@@ -349,6 +349,31 @@ footer button{background:none;border:none;color:var(--ink-soft);text-decoration:
 .fd-box p{margin:0;font-size:13px;line-height:1.5;white-space:pre-wrap;color:var(--ink);}
 .fd-nav{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;padding:12px 24px 16px;border-top:1px solid var(--line);}
 .fd-foot{height:8px;background-size:cover;background-position:center;}
+.adm-sheet{max-width:860px;}
+.adm-body{padding:18px 24px 20px;font-size:13.5px;color:var(--ink);}
+.adm-body p{margin:0 0 14px;line-height:1.5;}
+.adm-hint{color:var(--ink-soft);font-size:12.5px;}
+.adm-form{display:flex;flex-direction:column;gap:10px;max-width:360px;}
+.adm-form label{display:flex;flex-direction:column;gap:4px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-soft);}
+.adm-form input{font-family:'Inter',sans-serif;font-size:14px;border:1px solid var(--line);border-radius:8px;padding:9px 11px;color:var(--ink);}
+.adm-actions{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;margin-top:12px;}
+.adm-form .adm-actions{justify-content:flex-start;}
+.fbtn.adm-primary{background:var(--teal-900);color:#fff;border-color:var(--teal-900);}
+.fbtn.adm-primary:hover{background:var(--teal-700);}
+.adm-err{color:#b3492f;font-size:12.5px;}
+.adm-ok{background:#eaf5ee;border:1px solid #bfe0c9;color:#1f5d36;border-radius:8px;padding:9px 12px;margin-bottom:14px;font-size:13px;}
+.adm-table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:10px;}
+.adm-table{width:100%;border-collapse:collapse;font-size:13px;}
+.adm-table th{background:var(--teal-900);color:#fff;font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:500;letter-spacing:.05em;text-align:left;padding:8px 10px;white-space:nowrap;}
+.adm-table td{padding:6px 10px;border-top:1px solid var(--line);}
+.adm-table tbody tr:nth-child(even){background:var(--paper);}
+.adm-table .adm-c{text-align:center;}
+.adm-table input[type=checkbox]{accent-color:var(--teal-700);width:16px;height:16px;}
+.adm-name{width:100%;min-width:170px;border:1px solid var(--line);border-radius:7px;padding:6px 9px;font-family:'Inter',sans-serif;font-size:13px;color:var(--ink);background:var(--white);}
+.adm-del{background:none;border:none;color:var(--ink-soft);font-size:18px;cursor:pointer;line-height:1;}
+.adm-del:hover{color:#b3492f;}
+.adm-pwchange{margin-top:18px;border-top:1px solid var(--line);padding-top:12px;}
+.adm-pwchange summary{cursor:pointer;font-weight:600;font-size:13px;color:var(--teal-700);margin-bottom:10px;}
 .funnel-toggle{display:inline-flex;align-items:center;gap:5px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--ink-soft);cursor:pointer;margin-right:auto;}
 .funnel-toggle input{accent-color:var(--teal-700);margin:0;}
 .pdetails{margin-top:10px;border:1px dashed var(--line);border-radius:8px;padding:7px 10px;background:var(--white);}
@@ -413,6 +438,7 @@ footer button{background:none;border:none;color:var(--ink-soft);text-decoration:
   <span id="storageNotice">Connecting…</span>
   <span id="saveStatus" class="save-status"></span>
   <span class="footer-actions">
+    <button id="adminBtn" hidden>User management</button>
     <button id="exportBtn">Export backup</button>
     <label class="footer-link">Import backup<input type="file" id="importInput" accept="application/json"></label>
     <button id="resetBtn">Clear session notes &amp; prep</button>
@@ -504,15 +530,35 @@ function defaultData(){
 }
 
 const ALL_STOPS = ['eur','buz','gcr','mai','ams','global'];
-const REGION_ACCESS = {
-  'Fabio Saxer':'all',
-  'Jris Niedermann':'all',
-  'Lucia Manatschal':['ams'],
-  'Sudhir Punyamurthula':['mai'],
-  'Yan Chen':['gcr'],
-  'Roman Heuberger':['buz'],
-  'Fabio Keller':['buz']
-};
+/* Users and their region access. These defaults are only a fallback — the real list lives in
+   the Supabase table spi_users and is maintained in the user management cockpit. */
+const DEFAULT_USERS = [
+  {name:'Fabio Saxer', access:['all'], admin:true},
+  {name:'Jris Niedermann', access:['all'], admin:false},
+  {name:'Lucia Manatschal', access:['ams'], admin:false},
+  {name:'Yan Chen', access:['gcr'], admin:false},
+  {name:'Sudhir Punyamurthula', access:['mai'], admin:false},
+  {name:'Roman Heuberger', access:['buz'], admin:false},
+  {name:'Fabio Keller', access:['buz'], admin:false}
+];
+let USERS = [], KNOWN_USERS = [], REGION_ACCESS = {};
+let usersFromDb = false;
+function applyUsers(list){
+  USERS = list.map(u=>({name:u.name, access:(u.access||[]).slice(), admin:!!u.admin}));
+  KNOWN_USERS = USERS.map(u=>u.name);
+  REGION_ACCESS = {};
+  USERS.forEach(u=>{ REGION_ACCESS[u.name] = u.access.includes('all') ? 'all' : u.access.slice(); });
+}
+applyUsers(DEFAULT_USERS);
+function isAdminUser(name){ const u = USERS.find(x=>x.name===name); return !!(u && u.admin); }
+async function loadUsers(){
+  if(!sb) return;
+  try{
+    const {data, error} = await sb.from('spi_users').select('name,access,admin,sort').order('sort');
+    if(error) throw error;
+    if(data && data.length){ applyUsers(data); usersFromDb = true; }
+  }catch(e){ console.warn('User list not available yet, using defaults:', (e && e.message) || e); }
+}
 function isRegionAllowed(regionId, user){
   const acc = REGION_ACCESS[user];
   if(!user || !acc || acc==='all') return true;
@@ -542,8 +588,14 @@ let usingLocalFallback = false;
    through a Postgres RPC function that checks the team passphrase
    server-side (never stored anywhere readable) — see getTeamPass()/sbWrite().
    localStorage is kept as an offline cache/fallback only. */
-const KNOWN_USERS = ['Fabio Saxer','Jris Niedermann','Lucia Manatschal','Yan Chen','Sudhir Punyamurthula','Roman Heuberger','Fabio Keller'];
 let currentUser = null;
+/* A stored name may no longer exist after a user was renamed or removed in the cockpit. */
+function storedUser(){
+  let name = '';
+  try{ name = localStorage.getItem('spi_currentUser') || ''; }catch(e){}
+  if(name && !KNOWN_USERS.includes(name)){ name = ''; try{ localStorage.removeItem('spi_currentUser'); }catch(e){} }
+  return name;
+}
 function showUserModal(){
   return new Promise(resolve=>{
     const old = document.getElementById('userModalOverlay');
@@ -572,7 +624,7 @@ function showUserModal(){
 }
 async function getCurrentUser(){
   if(currentUser) return currentUser;
-  try{ currentUser = localStorage.getItem('spi_currentUser') || ''; }catch(e){}
+  currentUser = storedUser();
   if(!currentUser){
     currentUser = await showUserModal();
     if(currentUser){ try{ localStorage.setItem('spi_currentUser', currentUser); }catch(e){} }
@@ -594,6 +646,8 @@ function updateWhoAmI(){
   const el = document.getElementById('whoAmIBtn');
   if(!el) return;
   el.textContent = currentUser ? ('Angemeldet als: '+currentUser) : 'Wer bist du?';
+  const adm = document.getElementById('adminBtn');
+  if(adm) adm.hidden = !isAdminUser(currentUser);
 }
 let teamPass = null;
 function showPassModal(){
@@ -2298,6 +2352,208 @@ function pptDetailSlide(pptx, x){
     .forEach(([t,v],i)=>box(rightX, colY+i*(h+gap), rightW, h, t, v, 9.5));
 }
 
+/* ---------------- User management cockpit ----------------
+   Admins only. The cockpit password is checked server-side against a bcrypt hash in spi_admin
+   (never readable from the browser); users and region access are written through
+   admin_save_users(). The password is kept in memory only while the cockpit is open.
+   Note: region access controls which views someone gets — it isn't a security boundary,
+   since the project data itself is readable by everyone with the link. */
+let adminPass = null;
+let adminDraft = [];
+function adminRegions(){ return DATA ? DATA.regions.map(r=>({id:r.id, code:r.code})) : []; }
+function adminErrText(e){
+  const m = String((e && e.message) || e || '');
+  if(/wrong admin password/i.test(m)) return 'Wrong password.';
+  if(/wrong setup code/i.test(m)) return 'The setup code does not match. Copy it again from the Supabase SQL result.';
+  if(/already set/i.test(m)) return 'An admin password is already set. Reload the page and log in.';
+  if(/too short/i.test(m)) return 'The password needs at least 8 characters.';
+  if(/at least one admin/i.test(m)) return 'Keep at least one admin, otherwise nobody can open this cockpit any more.';
+  return 'That did not work: '+m;
+}
+function adminShell(bodyHtml){
+  const old = document.getElementById('adminOverlay');
+  if(old) old.remove();
+  const overlay = document.createElement('div');
+  overlay.id = 'adminOverlay';
+  overlay.className = 'fd-overlay';
+  overlay.innerHTML = `<div class="fd-sheet adm-sheet" role="dialog" aria-label="User management">
+    <div class="fd-head" style="background-image:url('${BRAND_GRADIENT}')"><h2>User management</h2><img src="${BRAND_LOGO}" alt="Bühler"></div>
+    <div class="adm-body">${bodyHtml}</div>
+  </div>`;
+  overlay.addEventListener('click', e=>{ if(e.target===overlay) closeAdmin(); });
+  document.body.appendChild(overlay);
+  overlay.querySelectorAll('[data-adm="close"]').forEach(b=>b.addEventListener('click', closeAdmin));
+  return overlay;
+}
+function closeAdmin(){
+  adminPass = null; adminDraft = [];
+  const o = document.getElementById('adminOverlay'); if(o) o.remove();
+}
+async function openAdmin(){
+  if(!isAdminUser(currentUser)) return;
+  adminPass = null;
+  let status = 'unavailable';
+  try{ const {data, error} = await sb.rpc('admin_status'); if(error) throw error; status = data; }catch(e){ console.warn('admin_status', e); }
+  if(status==='setup') renderAdminSetup();
+  else if(status==='ready') renderAdminLogin();
+  else adminShell(`<p>The user management tables aren't set up in Supabase yet. Run the setup SQL in the Supabase SQL editor first, then reload this page.</p>
+    <div class="adm-actions"><button class="fbtn" data-adm="close">Close</button></div>`);
+}
+function renderAdminLogin(){
+  const o = adminShell(`<p>Enter the cockpit password.</p>
+    <form class="adm-form" id="admLoginForm" autocomplete="off">
+      <label>Password<input type="password" id="admPw" autocomplete="current-password" required></label>
+      <div class="adm-err" id="admErr" hidden></div>
+      <div class="adm-actions"><button type="button" class="fbtn" data-adm="close">Cancel</button><button type="submit" class="fbtn adm-primary">Unlock</button></div>
+    </form>`);
+  const pw = o.querySelector('#admPw'); pw.focus();
+  o.querySelector('#admLoginForm').addEventListener('submit', async e=>{
+    e.preventDefault();
+    const err = o.querySelector('#admErr'); err.hidden = true;
+    try{
+      const {data, error} = await sb.rpc('admin_check', {p_password: pw.value});
+      if(error) throw error;
+      if(!data){ err.textContent = 'Wrong password.'; err.hidden = false; pw.select(); return; }
+      adminPass = pw.value;
+      renderAdminUsers();
+    }catch(ex){ err.textContent = adminErrText(ex); err.hidden = false; }
+  });
+}
+function renderAdminSetup(){
+  const o = adminShell(`<p>No cockpit password is set yet. Enter the one-time setup code shown in the Supabase SQL result, then choose your password (at least 8 characters).</p>
+    <form class="adm-form" id="admSetupForm" autocomplete="off">
+      <label>Setup code<input type="text" id="admCode" autocomplete="off" required></label>
+      <label>New password<input type="password" id="admNew" autocomplete="new-password" required minlength="8"></label>
+      <label>Repeat password<input type="password" id="admNew2" autocomplete="new-password" required minlength="8"></label>
+      <div class="adm-err" id="admErr" hidden></div>
+      <div class="adm-actions"><button type="button" class="fbtn" data-adm="close">Cancel</button><button type="submit" class="fbtn adm-primary">Set password</button></div>
+    </form>`);
+  o.querySelector('#admCode').focus();
+  o.querySelector('#admSetupForm').addEventListener('submit', async e=>{
+    e.preventDefault();
+    const err = o.querySelector('#admErr'); err.hidden = true;
+    const code = o.querySelector('#admCode').value.trim(), p1 = o.querySelector('#admNew').value, p2 = o.querySelector('#admNew2').value;
+    if(p1.length<8){ err.textContent = 'The password needs at least 8 characters.'; err.hidden = false; return; }
+    if(p1!==p2){ err.textContent = "The two passwords don't match."; err.hidden = false; return; }
+    try{
+      const {error} = await sb.rpc('admin_setup', {p_code: code, p_password: p1});
+      if(error) throw error;
+      adminPass = p1;
+      renderAdminUsers('Password set. From now on the cockpit asks for it.');
+    }catch(ex){ err.textContent = adminErrText(ex); err.hidden = false; }
+  });
+}
+function adminRowHtml(u, i){
+  const regions = adminRegions(), all = u.access.includes('all');
+  return `<tr data-row="${i}">
+    <td><input type="text" class="adm-name" value="${escapeHtml(u.name)}" aria-label="Name"></td>
+    <td class="adm-c"><input type="checkbox" class="adm-all" ${all?'checked':''} aria-label="All regions"></td>
+    ${regions.map(r=>`<td class="adm-c"><input type="checkbox" class="adm-reg" data-reg="${r.id}" ${!all && u.access.includes(r.id)?'checked':''} ${all?'disabled':''} aria-label="${r.code}"></td>`).join('')}
+    <td class="adm-c"><input type="checkbox" class="adm-admin" ${u.admin?'checked':''} aria-label="Admin"></td>
+    <td class="adm-c"><button type="button" class="adm-del" data-del="${i}" aria-label="Remove ${escapeHtml(u.name)}">&times;</button></td>
+  </tr>`;
+}
+function readAdminDraft(o){
+  o.querySelectorAll('tr[data-row]').forEach(tr=>{
+    const u = adminDraft[+tr.getAttribute('data-row')];
+    u.name = tr.querySelector('.adm-name').value.trim();
+    u.admin = tr.querySelector('.adm-admin').checked;
+    u.access = tr.querySelector('.adm-all').checked ? ['all'] : [...tr.querySelectorAll('.adm-reg:checked')].map(c=>c.getAttribute('data-reg'));
+  });
+}
+function renderAdminUsers(message){
+  if(!adminPass) return renderAdminLogin();
+  if(!adminDraft.length) adminDraft = USERS.map(u=>({...u, access:u.access.slice(), orig:u.name}));
+  const regions = adminRegions();
+  const o = adminShell(`${message?`<div class="adm-ok">${escapeHtml(message)}</div>`:''}
+    <p class="adm-hint">Region access decides which regions someone sees in Prep, Exchange Mode and Follow-up Tasks. Global and the Dashboard stay visible for everyone. Admins can open this cockpit.</p>
+    <div class="adm-table-wrap"><table class="adm-table">
+      <thead><tr><th>Name</th><th class="adm-c">All regions</th>${regions.map(r=>`<th class="adm-c">${r.code}</th>`).join('')}<th class="adm-c">Admin</th><th></th></tr></thead>
+      <tbody>${adminDraft.map((u,i)=>adminRowHtml(u,i)).join('')}</tbody>
+    </table></div>
+    <button type="button" class="add-project-toggle" id="admAdd">+ Add user</button>
+    <div class="adm-err" id="admErr" hidden></div>
+    <div class="adm-actions"><button type="button" class="fbtn" data-adm="close">Close</button><button type="button" class="fbtn adm-primary" id="admSave">Save changes</button></div>
+    <details class="adm-pwchange"><summary>Change cockpit password</summary>
+      <form class="adm-form" id="admPwForm" autocomplete="off">
+        <label>New password<input type="password" id="admNew" autocomplete="new-password" minlength="8" required></label>
+        <label>Repeat password<input type="password" id="admNew2" autocomplete="new-password" minlength="8" required></label>
+        <div class="adm-err" id="admPwErr" hidden></div>
+        <div class="adm-actions"><button type="submit" class="fbtn">Change password</button></div>
+      </form>
+    </details>`);
+  o.querySelectorAll('.adm-all').forEach(cb=>cb.addEventListener('change', ()=>{
+    cb.closest('tr').querySelectorAll('.adm-reg').forEach(r=>{ r.disabled = cb.checked; if(cb.checked) r.checked = false; });
+  }));
+  o.querySelectorAll('[data-del]').forEach(b=>b.addEventListener('click', ()=>{
+    readAdminDraft(o);
+    adminDraft.splice(+b.getAttribute('data-del'), 1);
+    renderAdminUsers();
+  }));
+  o.querySelector('#admAdd').addEventListener('click', ()=>{
+    readAdminDraft(o);
+    adminDraft.push({name:'', access:[], admin:false, orig:''});
+    renderAdminUsers();
+    const inputs = document.querySelectorAll('#adminOverlay .adm-name');
+    inputs[inputs.length-1].focus();
+  });
+  o.querySelector('#admSave').addEventListener('click', ()=>saveAdminUsers(o));
+  o.querySelector('#admPwForm').addEventListener('submit', async e=>{
+    e.preventDefault();
+    const err = o.querySelector('#admPwErr'); err.hidden = true;
+    const p1 = o.querySelector('#admNew').value, p2 = o.querySelector('#admNew2').value;
+    if(p1.length<8){ err.textContent = 'The password needs at least 8 characters.'; err.hidden = false; return; }
+    if(p1!==p2){ err.textContent = "The two passwords don't match."; err.hidden = false; return; }
+    try{
+      const {error} = await sb.rpc('admin_change_password', {p_old: adminPass, p_new: p1});
+      if(error) throw error;
+      adminPass = p1;
+      readAdminDraft(o);
+      renderAdminUsers('Cockpit password changed.');
+    }catch(ex){ err.textContent = adminErrText(ex); err.hidden = false; }
+  });
+}
+async function saveAdminUsers(o){
+  readAdminDraft(o);
+  const err = o.querySelector('#admErr'); err.hidden = true;
+  const fail = t=>{ err.textContent = t; err.hidden = false; };
+  const rows = adminDraft.filter(u=>u.name || u.orig);
+  if(rows.some(u=>!u.name)) return fail('Every user needs a name. Remove empty rows with ×.');
+  const lower = rows.map(u=>u.name.toLowerCase());
+  const dup = lower.find((n,i)=>lower.indexOf(n)!==i);
+  if(dup) return fail('The name "'+rows[lower.indexOf(dup)].name+'" is used twice.');
+  const noRegion = rows.find(u=>!u.access.length);
+  if(noRegion) return fail('Pick "All regions" or at least one region for '+noRegion.name+'.');
+  if(!rows.some(u=>u.admin)) return fail('Keep at least one admin, otherwise nobody can open this cockpit any more.');
+  const btn = o.querySelector('#admSave'); btn.disabled = true; btn.textContent = 'Saving…';
+  try{
+    const {error} = await sb.rpc('admin_save_users', {p_users: rows.map(u=>({name:u.name, access:u.access, admin:u.admin})), p_password: adminPass});
+    if(error) throw error;
+    /* Renamed users keep their authorship on prep items and session notes. */
+    const renames = {};
+    rows.forEach(u=>{ if(u.orig && u.orig!==u.name) renames[u.orig] = u.name; });
+    if(Object.keys(renames).length && DATA){
+      DATA.prepItems.forEach(i=>{ if(renames[i.author]) i.author = renames[i.author]; });
+      DATA.regions.concat([DATA.global]).forEach(r=>(r.log||[]).forEach(l=>{ if(renames[l.author]) l.author = renames[l.author]; }));
+      await saveData();
+    }
+    if(renames[currentUser]){ currentUser = renames[currentUser]; try{ localStorage.setItem('spi_currentUser', currentUser); }catch(e){} }
+    applyUsers(rows);
+    usersFromDb = true;
+    if(!KNOWN_USERS.includes(currentUser)){ currentUser = ''; try{ localStorage.removeItem('spi_currentUser'); }catch(e){} }
+    adminDraft = rows.map(u=>({...u, access:u.access.slice(), orig:u.name}));
+    updateWhoAmI();
+    if(DATA) renderTab();
+    if(!isAdminUser(currentUser)){ closeAdmin(); return; }
+    renderAdminUsers('Saved. The changes apply to everyone after they reload the page.');
+  }catch(ex){
+    btn.disabled = false; btn.textContent = 'Save changes';
+    if(/wrong admin password/i.test(String(ex && ex.message))){ adminPass = null; renderAdminLogin(); return; }
+    fail(adminErrText(ex));
+  }
+}
+document.addEventListener('keydown', e=>{ if(e.key==='Escape' && document.getElementById('adminOverlay')) closeAdmin(); });
+
 /* ---------------- Nav / shell ---------------- */
 function setActiveNav(tab){
   document.querySelectorAll('#mainNav button').forEach(b=>{
@@ -2388,8 +2644,11 @@ document.getElementById('importInput').addEventListener('change', (e)=>{
 
 document.getElementById('whoAmIBtn').addEventListener('click', changeCurrentUser);
 
+document.getElementById('adminBtn').addEventListener('click', openAdmin);
+
 (async function init(){
-  try{ currentUser = localStorage.getItem('spi_currentUser') || ''; }catch(e){}
+  await loadUsers();
+  currentUser = storedUser();
   updateWhoAmI();
   await loadData();
   renderTab();
