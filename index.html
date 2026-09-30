@@ -1795,6 +1795,25 @@ function sampleEdge(nodes){
   return out;
 }
 const EDGE_TOP = sampleEdge(FUNNEL_TOP_NODES), EDGE_BOT = sampleEdge(FUNNEL_BOT_NODES);
+/* A funnel shape is a pair of sampled edges in the 1000x420 unit box. The screen uses the gentle
+   silhouette above; the slide uses a stronger taper so its free corners can hold the holding
+   groups and the legend. */
+const SCREEN_SHAPE = {top:EDGE_TOP, bot:EDGE_BOT};
+function catmullEdge(pts, per=24){
+  const out = [], P = i=>pts[Math.max(0, Math.min(pts.length-1, i))];
+  for(let i=0; i<pts.length-1; i++){
+    const p0 = P(i-1), p1 = P(i), p2 = P(i+1), p3 = P(i+2);
+    for(let k=(i?1:0); k<=per; k++){
+      const t = k/per, t2 = t*t, t3 = t2*t;
+      out.push([0,1].map(c=>0.5*(2*p1[c] + (p2[c]-p0[c])*t + (2*p0[c]-5*p1[c]+4*p2[c]-p3[c])*t2 + (3*p1[c]-p0[c]-3*p2[c]+p3[c])*t3)));
+    }
+  }
+  return out;
+}
+const SLIDE_SHAPE = {
+  top: catmullEdge([[0,0],[187,57],[421,101],[720,159],[1000,175]]),
+  bot: catmullEdge([[0,420],[187,366],[421,327],[720,268],[1000,249]])
+};
 function edgeY(edge, x){
   for(let j=1; j<edge.length; j++){
     if(edge[j][0] >= x){
@@ -1805,12 +1824,12 @@ function edgeY(edge, x){
   }
   return edge[edge.length-1][1];
 }
-function bandPolygon(i, splits=FUNNEL_SPLITS, samples=14){
+function bandPolygon(i, splits=FUNNEL_SPLITS, samples=14, shape=SCREEN_SHAPE){
   const x0 = splits[i], x1 = splits[i+1], top = [], bot = [];
   for(let k=0; k<samples; k++){
     const x = x0 + (x1-x0)*k/(samples-1);
-    top.push([x, edgeY(EDGE_TOP,x)]);
-    bot.push([x, edgeY(EDGE_BOT,x)]);
+    top.push([x, edgeY(shape.top,x)]);
+    bot.push([x, edgeY(shape.bot,x)]);
   }
   return top.concat(bot.reverse());
 }
@@ -1819,12 +1838,12 @@ function bandPolygon(i, splits=FUNNEL_SPLITS, samples=14){
    right, so a band there needs more width for the same number of projects — the widths are
    solved iteratively against the usable height at each band's right (tightest) edge. */
 const FUNNEL_MIN_BAND = 90;
-function bandHeightAt(x){ return edgeY(EDGE_BOT,x) - edgeY(EDGE_TOP,x); }
-function funnelLayout(counts, minBand=FUNNEL_MIN_BAND){
+function bandHeightAt(x, shape=SCREEN_SHAPE){ return edgeY(shape.bot,x) - edgeY(shape.top,x); }
+function funnelLayout(counts, minBand=FUNNEL_MIN_BAND, shape=SCREEN_SHAPE){
   let splits = FUNNEL_SPLITS.slice();
   if(counts.some(n=>n>0)){
     for(let iter=0; iter<8; iter++){
-      const need = counts.map((n,i)=>Math.max(n, 0.5)/bandHeightAt((splits[i]+splits[i+1])/2));
+      const need = counts.map((n,i)=>Math.max(n, 0.5)/bandHeightAt((splits[i]+splits[i+1])/2, shape));
       let widths = need.map(v=>v);
       const fixed = widths.map(()=>false);
       for(let pass=0; pass<widths.length; pass++){
@@ -1842,7 +1861,7 @@ function funnelLayout(counts, minBand=FUNNEL_MIN_BAND){
   }
   const bounds = STATUS_ORDER.map((s,i)=>{
     const x0 = splits[i], x1 = splits[i+1];
-    const top = edgeY(EDGE_TOP,x1), bot = edgeY(EDGE_BOT,x1), pad = 5;
+    const top = edgeY(shape.top,x1), bot = edgeY(shape.bot,x1), pad = 5;
     return {left:x0/FUNNEL_W*100, width:(x1-x0)/FUNNEL_W*100, top:(top+pad)/FUNNEL_H*100, height:(bot-top-2*pad)/FUNNEL_H*100};
   });
   return {splits, bounds};
@@ -1905,7 +1924,7 @@ function ftokHtml(x, tone, band){
 /* Column layout inside one band: every column is as tall as the funnel is at the column's right
    edge (its tightest point), so tokens follow the taper instead of sitting in the band's
    smallest rectangle. W/H are the funnel box size in the caller's unit (px or inches). */
-function bandColumns(i, splits, W, H, d, gap, padX, padY){
+function bandColumns(i, splits, W, H, d, gap, padX, padY, shape=SCREEN_SHAPE){
   const x0 = splits[i]*W/FUNNEL_W + padX, x1 = splits[i+1]*W/FUNNEL_W - padX;
   const usable = x1 - x0;
   const cols = Math.floor((usable+gap)/(d+gap));
@@ -1915,8 +1934,8 @@ function bandColumns(i, splits, W, H, d, gap, padX, padY){
   const out = [];
   for(let c=0; c<cols; c++){
     const left = start + c*(d+gap), cx = left + d/2, right = left + d;
-    const top = uy(edgeY(EDGE_TOP, ux(right))) + padY, bot = uy(edgeY(EDGE_BOT, ux(right))) - padY;
-    const mid = uy((edgeY(EDGE_TOP, ux(cx)) + edgeY(EDGE_BOT, ux(cx)))/2);
+    const top = uy(edgeY(shape.top, ux(right))) + padY, bot = uy(edgeY(shape.bot, ux(right))) - padY;
+    const mid = uy((edgeY(shape.top, ux(cx)) + edgeY(shape.bot, ux(cx)))/2);
     out.push({cx, top, bot, mid, rows:Math.max(0, Math.floor((bot-top+gap)/(d+gap)))});
   }
   return out;
@@ -1940,9 +1959,9 @@ function placeInColumns(cols, n, d, gap){
   });
   return pos;
 }
-function fitBandDiameter(bands, splits, W, H, dMax, dMin, step, gap, padX, padY){
+function fitBandDiameter(bands, splits, W, H, dMax, dMin, step, gap, padX, padY, shape=SCREEN_SHAPE){
   for(let d=dMax; d>=dMin-1e-9; d-=step){
-    if(bands.every((list,i)=>!list.length || bandCapacity(bandColumns(i, splits, W, H, d, gap, padX, padY))>=list.length)) return d;
+    if(bands.every((list,i)=>!list.length || bandCapacity(bandColumns(i, splits, W, H, d, gap, padX, padY, shape))>=list.length)) return d;
   }
   return dMin;
 }
@@ -2185,7 +2204,9 @@ async function buildFunnelPptx(){
   pptx.layout = 'WIDE';
   await pptDefineMasters(pptx);
   pptOverviewSlide(pptx, g);
-  funnelOrdered(g).forEach(x=>pptDetailSlide(pptx, x));
+  const list = funnelOrdered(g);
+  const photos = await Promise.all(list.map(x=>x.p.hasImage ? pptPhoto(x.id) : null));
+  list.forEach((x,i)=>pptDetailSlide(pptx, x, photos[i]));
   return pptx;
 }
 async function exportFunnelPptx(){
@@ -2193,63 +2214,101 @@ async function exportFunnelPptx(){
   await pptx.writeFile({fileName: exportFileName('pptx'), compression:true});
 }
 
-/* Same header band on every slide: brand gradient, white title, logo on the right. The
-   gradient and logo live on two slide masters so the file stores them once, not per slide —
-   the band images are cropped to the exact band shape here because masters can't crop. */
-const PPT_HEADER_H = 0.78, PPT_FOOTER_Y = 7.34, PPT_FOOTER_H = 0.16;
-function cropCover(src, aspect){
+/* Slides follow the BUZ project-funnel deck, in the website palette: a white overview slide the
+   funnel fills edge to edge, and dark detail slides with translucent content boxes. Background,
+   logo and margin text live on two slide masters so the file stores them once, not per slide. */
+const PPT_W = 13.33, PPT_H = 7.5;
+const PPT_FONT = 'Segoe UI', PPT_FONT_LIGHT = 'Segoe UI Light';
+const PPT_PANEL = {x:0.21, y:0.21, w:12.71, h:7.08};
+/* Corporate icons (24-unit viewBox), rasterised white for the detail boxes. */
+const PPT_ICON_PATHS = {
+  problem: 'M23.1,21H0.9L12,1.8L23.1,21z M4.4,19h15.2L12,5.8L4.4,19z M11,9h2v6h-2V9z M12,16c-0.6,0-1,0.4-1,1s0.4,1,1,1 s1-0.4,1-1S12.6,16,12,16z',
+  goal: 'M23.14,1H3V23H5V15H23.14L17.3,8ZM15,5V7h.53L15,7.64V7H13V9h2V8.36l.53.64H15v2h2v-.24l.2.24H17v2H15V11H13v2H11V11H9v2H7V11H5V9H7V7H5V5H7V3H9V5h2V3h2V5h2V3h2V5h.2l-.2.24V5ZM9,7H7V5H9ZM9,7h2V9H9Zm2,2h2v2H11ZM9,9v2H7V9Zm4-4V7H11V5Z',
+  progress: 'M12,7a5,5,0,1,0,5,5A5,5,0,0,0,12,7Zm0,9a4,4,0,1,1,4-4A4,4,0,0,1,12,16Zm9-4c0-.15,0-.29,0-.43l1.84-2.8L20.22,4.23l-3.36.2A7.5,7.5,0,0,0,16.12,4l-1.5-3H9.38L7.88,4a7.5,7.5,0,0,0-.74.42l-3.36-.2L1.17,8.77,3,11.57c0,.14,0,.28,0,.43s0,.29,0,.43l-1.84,2.8,2.61,4.54,3.36-.2a7.5,7.5,0,0,0,.74.42l1.5,3h5.24l1.5-3a7.5,7.5,0,0,0,.74-.42l3.36.2,2.61-4.54L21,12.43C21,12.29,21,12.15,21,12Zm-2-.61a6.22,6.22,0,0,1,0,1.22l0,.35,1.55,2.34L19.1,17.7l-2.8-.17-.29.2a7.2,7.2,0,0,1-1.05.61l-.32.15L13.38,21H10.62L9.36,18.49,9,18.34a7.2,7.2,0,0,1-1-.61l-.29-.2-2.8.17L3.51,15.3,5.06,13l0-.35a6.22,6.22,0,0,1,0-1.22l0-.35L3.51,8.7,4.9,6.3l2.8.17L8,6.27a7.2,7.2,0,0,1,1-.61l.32-.15L10.62,3h2.76l1.26,2.51.32.15A7.2,7.2,0,0,1,16,6.27l.29.2,2.8-.17,1.39,2.4L18.94,11Z'
+};
+function pptIcon(key){
+  const px = 256, c = document.createElement('canvas');
+  c.width = c.height = px;
+  const ctx = c.getContext('2d');
+  ctx.scale(px/24, px/24);
+  ctx.fillStyle = '#ffffff';
+  ctx.fill(new Path2D(PPT_ICON_PATHS[key]));
+  return c.toDataURL('image/png');
+}
+function loadImage(src){
   return new Promise((resolve, reject)=>{
     const img = new Image();
-    img.onload = ()=>{
-      let sw = img.width, sh = Math.round(img.width/aspect);
-      if(sh > img.height){ sh = img.height; sw = Math.round(sh*aspect); }
-      const c = document.createElement('canvas');
-      c.width = sw; c.height = sh;
-      c.getContext('2d').drawImage(img, (img.width-sw)/2, (img.height-sh)/2, sw, sh, 0, 0, sw, sh);
-      resolve(c.toDataURL('image/jpeg', 0.9));
-    };
-    img.onerror = ()=>reject(new Error('Could not prepare the brand gradient'));
+    img.onload = ()=>resolve(img);
+    img.onerror = ()=>reject(new Error('Could not load an image for the slides'));
     img.src = src;
   });
 }
+/* The white logo, recoloured to brand teal and turned upright for the right-hand margin. */
+async function pptVerticalLogo(){
+  const img = await loadImage(BRAND_LOGO);
+  const c = document.createElement('canvas');
+  c.width = img.height; c.height = img.width;
+  const ctx = c.getContext('2d');
+  ctx.translate(0, img.width); ctx.rotate(-Math.PI/2); ctx.drawImage(img, 0, 0);
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.globalCompositeOperation = 'source-in';
+  ctx.fillStyle = '#1c8e85'; ctx.fillRect(0, 0, c.width, c.height);
+  return {data:c.toDataURL('image/png'), aspect:c.width/c.height};
+}
+/* Dark panel of the detail slides: navy to petrol with a teal glow and faint brand shapes. */
+function pptDetailBackground(){
+  const w = 1600, h = Math.round(w*PPT_PANEL.h/PPT_PANEL.w);
+  const c = document.createElement('canvas');
+  c.width = w; c.height = h;
+  const ctx = c.getContext('2d');
+  const lin = ctx.createLinearGradient(0, 0, w*0.35, h);
+  lin.addColorStop(0, '#0b3948'); lin.addColorStop(1, '#0f5f68');
+  ctx.fillStyle = lin; ctx.fillRect(0, 0, w, h);
+  const glow = ctx.createRadialGradient(w*0.5, h*1.05, 0, w*0.5, h*1.05, w*0.62);
+  glow.addColorStop(0, 'rgba(28,142,133,0.6)'); glow.addColorStop(1, 'rgba(28,142,133,0)');
+  ctx.fillStyle = glow; ctx.fillRect(0, 0, w, h);
+  ctx.fillStyle = 'rgba(255,255,255,0.035)';
+  [[0.5,0.36,0.3],[0.63,0.6,0.2],[0.4,0.66,0.14]].forEach(([x,y,r])=>{
+    const R = r*h;
+    ctx.beginPath(); ctx.roundRect(x*w-R, y*h-R, 2*R, 2*R, [0,R,R,R]); ctx.fill();
+  });
+  return c.toDataURL('image/jpeg', 0.86);
+}
 async function pptDefineMasters(pptx){
-  const band = await cropCover(BRAND_GRADIENT, 13.33/PPT_HEADER_H);
-  const strip = await cropCover(BRAND_GRADIENT, 13.33/PPT_FOOTER_H);
-  const logoH = 1.32*120/620;
-  const header = [
-    {image:{x:0, y:0, w:13.33, h:PPT_HEADER_H, data:band}},
-    {image:{x:11.62, y:PPT_HEADER_H/2-logoH/2, w:1.32, h:logoH, data:BRAND_LOGO}}
-  ];
-  pptx.defineSlideMaster({title:'SPI_OVERVIEW', background:{color:'FFFFFF'}, objects:header});
-  pptx.defineSlideMaster({title:'SPI_DETAIL', background:{color:'FFFFFF'}, objects:header.concat([
-    {image:{x:0, y:PPT_FOOTER_Y, w:13.33, h:PPT_FOOTER_H, data:strip}},
-    {text:{text:'Bühler AG · SPI Global Exchange', options:{x:0.4, y:7.1, w:8, h:0.2, fontSize:8, color:'8AA0AC'}}}
-  ])});
+  const logo = await pptVerticalLogo();
+  const logoW = 0.2, logoObj = {image:{x:13.07, y:0.22, w:logoW, h:logoW/logo.aspect, data:logo.data}};
+  pptx.defineSlideMaster({title:'SPI_OVERVIEW', background:{color:'FFFFFF'}, objects:[logoObj]});
+  pptx.defineSlideMaster({title:'SPI_DETAIL', background:{color:'FFFFFF'}, objects:[
+    {image:Object.assign({data:pptDetailBackground()}, PPT_PANEL)},
+    logoObj,
+    {text:{text:'Project Management · SPI Global Exchange', options:{x:13.17-1.6, y:4.3-0.12, w:3.2, h:0.24, rotate:270, fontFace:PPT_FONT_LIGHT, fontSize:8, color:'9AA8AE', align:'center', valign:'middle'}}}
+  ].concat(...Object.values(PPT_DETAIL_BOXES).map(pptBoxMaster)),
+  slideNumber:{x:12.95, y:7.08, w:0.44, h:0.22, fontFace:PPT_FONT, fontSize:7, color:'9AA8AE', align:'center'}});
 }
-function pptHeader(slide, title){
-  slide.addText(String(title||''), {x:0.45, y:0.1, w:10.6, h:PPT_HEADER_H-0.2, fontSize:22, bold:true, color:'FFFFFF', valign:'middle', fit:'shrink'});
+/* The content boxes of the detail slides sit at fixed positions, so their shapes and icons are
+   part of the master too; each slide only adds the text. */
+const PPT_BOX_TEAL = {fill:'1C8E85', transparency:62}, PPT_BOX_GREEN = {fill:'93C94A', transparency:55};
+const PPT_DETAIL_BOXES = {
+  problem:   Object.assign({x:0.5,  y:1.35, w:5.9,  h:1.67, icon:'problem'}, PPT_BOX_TEAL),
+  lead:      Object.assign({x:6.55, y:1.35, w:2.25, h:1.67}, PPT_BOX_TEAL),
+  goal:      Object.assign({x:0.5,  y:3.13, w:8.3,  h:1.48, icon:'goal'}, PPT_BOX_GREEN),
+  partners:  Object.assign({x:9.0,  y:3.13, w:3.62, h:1.48}, PPT_BOX_TEAL),
+  progress:  Object.assign({x:0.5,  y:4.72, w:8.3,  h:2.33, icon:'progress'}, PPT_BOX_TEAL),
+  colleagues:Object.assign({x:9.0,  y:4.72, w:3.62, h:2.33}, PPT_BOX_TEAL)
+};
+const PPT_NOTES_BOX = Object.assign({x:9.0, y:1.35, w:3.62, h:1.67}, PPT_BOX_TEAL);
+const pptIconSize = b=>Math.min(0.95, b.h-0.4);
+function pptBoxShapeOpts(b){
+  return {x:b.x, y:b.y, w:b.w, h:b.h, shape:'roundRect', rectRadius:0.16, fill:{color:b.fill, transparency:b.transparency}, line:{type:'none'}};
 }
-/* Native funnel band: the sampled polygon as a custom shape, points in EMU relative to its box. */
-function pptBand(slide, i, fx, fy, fw, fh, splits=FUNNEL_SPLITS){
-  const EMU = 914400, pts = bandPolygon(i, splits, 14);
-  const x0 = splits[i], w = splits[i+1]-x0;
-  const shapeX = fx+fw*(x0/FUNNEL_W), shapeW = fw*(w/FUNNEL_W);
-  const ys = pts.map(p=>p[1]), yMin = Math.min(...ys), yMax = Math.max(...ys);
-  const shapeY = fy+fh*(yMin/FUNNEL_H), shapeH = fh*((yMax-yMin)/FUNNEL_H);
-  const points = pts.map(p=>({x:Math.round(((p[0]-x0)/w)*shapeW*EMU), y:Math.round(((p[1]-yMin)/(yMax-yMin))*shapeH*EMU)}));
-  slide.addShape('custGeom', {x:shapeX, y:shapeY, w:shapeW, h:shapeH, fill:{color:STAGE_HEX[STATUS_ORDER[i]]}, line:{type:'none'}, points});
-}
-const PPT_CIRCLE_MAX = 0.86, PPT_CIRCLE_MIN = 0.44, PPT_CIRCLE_GAP = 0.07;
-let PPT_CIRCLE_D = 0.72;
-function pptFitCircleD(w, h, n){
-  if(n<=0) return PPT_CIRCLE_MAX;
-  for(let d=PPT_CIRCLE_MAX; d>=PPT_CIRCLE_MIN; d-=0.01){
-    const cols = Math.max(1, Math.floor((w+PPT_CIRCLE_GAP)/(d+PPT_CIRCLE_GAP)));
-    if(Math.ceil(n/cols)*(d+PPT_CIRCLE_GAP)-PPT_CIRCLE_GAP <= h) return Math.round(d*100)/100;
+function pptBoxMaster(b){
+  const out = [{text:{text:'', options:pptBoxShapeOpts(b)}}];
+  if(b.icon){
+    const s = pptIconSize(b);
+    out.push({image:{x:b.x+0.42, y:b.y+(b.h-s)/2, w:s, h:s, data:pptIcon(b.icon)}});
   }
-  return PPT_CIRCLE_MIN;
+  return out;
 }
-function pptCircleRows(n, w){ const cols = Math.max(1, Math.floor((w+PPT_CIRCLE_GAP)/(PPT_CIRCLE_D+PPT_CIRCLE_GAP))); return Math.max(1, Math.ceil(n/cols)); }
 /* Text width estimate in inches; wide and narrow glyphs are told apart so line breaks hold. */
 function pptTxtWidth(s, fs){
   let u = 0;
@@ -2303,8 +2362,8 @@ function pptLayoutLines(tokens, fs, maxW){
 function pptFitCircleText(title, d){
   const t = String(title||'').trim();
   if(!t) return {text:'', size:8};
-  const maxW = d*0.76, maxH = d*0.70, tokens = pptWrapTokens(t);
-  const fsStart = Math.max(6, Math.min(14, Math.round(d*15*2)/2));
+  const maxW = d*0.68, maxH = d*0.58, tokens = pptWrapTokens(t);
+  const fsStart = Math.max(6, Math.min(12, Math.round(d*13*2)/2));
   let clean = null, any = null;
   for(let fs=fsStart; fs>=5; fs-=0.5){
     const lh = fs*1.16/72;
@@ -2321,146 +2380,237 @@ function pptFitCircleText(title, d){
   if(lines.length===maxLines) lines[maxLines-1] = lines[maxLines-1].replace(/-$/,'')+'…';
   return {text:lines.join('\n'), size:fs};
 }
-/* Equal-size teardrop tokens in a centred grid; overflow collapses into one "+N" token. */
-function pptCircles(slide, items, x, y, w, style, availH){
-  const d = PPT_CIRCLE_D, gap = PPT_CIRCLE_GAP, n = items.length;
-  if(!n) return 0;
-  const cols = Math.max(1, Math.floor((w+gap)/(d+gap)));
-  const maxRows = availH ? Math.max(1, Math.floor((availH+gap)/(d+gap))) : Infinity;
-  const capacity = cols*maxRows;
-  let shown = items, plus = 0;
-  if(n>capacity){ shown = items.slice(0, capacity-1); plus = n-(capacity-1); }
-  const total = shown.length + (plus>0?1:0);
-  const rows = Math.ceil(total/cols);
-  const neededH = rows*(d+gap)-gap;
-  const startY = y + (availH ? Math.max(0, (availH-neededH)/2) : 0);
-  for(let row=0; row<rows; row++){
-    const rowStart = row*cols, rowCount = Math.min(cols, total-rowStart);
-    const rowX = x + (w-(rowCount*(d+gap)-gap))/2;
-    for(let col=0; col<rowCount; col++){
-      const idx = rowStart+col;
-      const cx = rowX+col*(d+gap)+d/2, cy = startY+row*(d+gap)+d/2;
-      if(idx<shown.length) pptToken(slide, shown[idx], cx, cy, d, style);
-      else pptPlus(slide, plus, cx, cy, d, style);
-    }
-  }
-  return neededH;
+/* Overview slide: the funnel box covers the whole slide; the free corners above and below the
+   taper hold the paused/archived groups (top right) and the legend (bottom right). */
+const PPT_FUNNEL = {x:0.15, y:0.12, w:12.85, h:7.26};
+const PPT_TOKEN_MAX = 0.98, PPT_TOKEN_MIN = 0.42, PPT_TOKEN_GAP = 0.06, PPT_PAD_X = 0.06, PPT_PAD_Y = 0.07;
+const PPT_HOLD_AREA = {x:6.3, y:0.15, w:6.55, h:1.8};
+const PPT_TOKEN_STYLE = {
+  band:    {fill:'FFFFFF', text:'0B3948'},
+  onhold:  {fill:'B5B199', text:'0B3948'},
+  stopped: {fill:'6D6A5E', text:'FFFFFF'},
+  archived:{fill:'0B3948', text:'FFFFFF'}
+};
+const pptUx = v=>v*PPT_FUNNEL.w/FUNNEL_W, pptUy = v=>v*PPT_FUNNEL.h/FUNNEL_H;
+/* Native funnel band: the sampled polygon as a custom shape, points in EMU relative to its box. */
+function pptBand(slide, i, splits){
+  const F = PPT_FUNNEL, EMU = 914400, pts = bandPolygon(i, splits, 28, SLIDE_SHAPE);
+  const x0 = splits[i], w = splits[i+1]-x0;
+  const ys = pts.map(p=>p[1]), yMin = Math.min(...ys), yMax = Math.max(...ys);
+  const shapeX = F.x+pptUx(x0), shapeW = pptUx(w), shapeY = F.y+pptUy(yMin), shapeH = pptUy(yMax-yMin);
+  const points = pts.map(p=>({x:Math.round((p[0]-x0)/w*shapeW*EMU), y:Math.round((p[1]-yMin)/(yMax-yMin)*shapeH*EMU)}));
+  slide.addShape('custGeom', {x:shapeX, y:shapeY, w:shapeW, h:shapeH, fill:{color:STAGE_HEX[STATUS_ORDER[i]]}, line:{color:'FFFFFF', width:2.5}, points});
 }
+/* Round token with the classification badge (brand teardrop) at the lower right. */
 function pptToken(slide, it, cx, cy, d, style){
-  const ci = catInfo(it.p.classification);
-  const fill = style==='gray' ? 'CFCFC6' : style==='dark' ? '0B3948' : 'FFFFFF';
-  const txt = style==='dark' ? 'FFFFFF' : '0B3948';
-  slide.addShape('teardrop', {x:cx-d/2, y:cy-d/2, w:d, h:d, rotate:270, fill:{color:fill}, line:style?{type:'none'}:{color:'D6E4E4', width:.5}});
+  const ci = catInfo(it.p.classification), st = PPT_TOKEN_STYLE[style||'band'];
+  slide.addShape('ellipse', {x:cx-d/2, y:cy-d/2, w:d, h:d, fill:{color:st.fill}, line:{type:'none'}});
   const ft = pptFitCircleText(it.title, d);
-  slide.addText(ft.text, {x:cx-d/2+0.04, y:cy-d/2+0.04, w:d-0.08, h:d-0.08, fontSize:ft.size, align:'center', valign:'middle', color:txt, wrap:false, lineSpacingMultiple:0.96});
-  if(!style){
-    const bd = Math.max(0.15, Math.min(0.22, d*0.28));
-    slide.addShape('ellipse', {x:cx+d/2-bd*0.85, y:cy+d/2-bd*0.85, w:bd, h:bd, fill:{color:ci.bgHex}, line:{color:'FFFFFF', width:1}});
-    slide.addText(ci.code, {x:cx+d/2-bd*0.85, y:cy+d/2-bd*0.85, w:bd, h:bd, fontSize:Math.max(5, Math.min(7.5, bd*33)), bold:true, align:'center', valign:'middle', color:ci.fgHex, wrap:false});
-  }
+  slide.addText(ft.text, {x:cx-d/2+0.03, y:cy-d/2+0.03-d*0.04, w:d-0.06, h:d-0.06, fontFace:PPT_FONT, fontSize:ft.size, align:'center', valign:'middle', color:st.text, wrap:false, lineSpacingMultiple:0.95, margin:0});
+  const bd = Math.max(0.16, Math.min(0.28, d*0.3)), bx = cx+d*0.37-bd/2, by = cy+d*0.37-bd/2;
+  slide.addShape('teardrop', {x:bx, y:by, w:bd, h:bd, rotate:270, fill:{color:ci.bgHex}, line:{color:'FFFFFF', width:0.75}});
+  slide.addText(ci.code, {x:bx-0.05, y:by, w:bd+0.1, h:bd, fontFace:PPT_FONT, fontSize:Math.max(5.5, Math.min(10, bd*36)), align:'center', valign:'middle', color:ci.fgHex, wrap:false, margin:0});
 }
 function pptPlus(slide, plus, cx, cy, d, style){
-  const fill = style==='gray' ? 'CFCFC6' : style==='dark' ? '0B3948' : 'E4F0EF';
-  slide.addShape('teardrop', {x:cx-d/2, y:cy-d/2, w:d, h:d, rotate:270, fill:{color:fill}, line:{color:'A8C7D2', width:.75}});
-  slide.addText('+'+plus, {x:cx-d/2, y:cy-d/2, w:d, h:d, fontSize:9, bold:true, align:'center', valign:'middle', color:style==='dark'?'FFFFFF':'0B3948'});
+  const st = PPT_TOKEN_STYLE[style||'band'];
+  slide.addShape('ellipse', {x:cx-d/2, y:cy-d/2, w:d, h:d, fill:{color:st.fill}, line:{color:'A8C7D2', width:1, dashType:'dash'}});
+  slide.addText('+'+plus, {x:cx-d/2, y:cy-d/2, w:d, h:d, fontFace:PPT_FONT, fontSize:Math.max(9, d*16), bold:true, align:'center', valign:'middle', color:st.text, margin:0});
 }
-/* Funnel bands on the slide use the same column layout as the screen. */
-const PPT_PAD_X = 0.07, PPT_PAD_Y = 0.06;
-function pptBandTokens(slide, list, i, splits, fx, fy, fw, fh){
-  const d = PPT_CIRCLE_D, gap = PPT_CIRCLE_GAP;
-  const cols = bandColumns(i, splits, fw, fh, d, gap, PPT_PAD_X, PPT_PAD_Y);
+/* Funnel bands use the same column layout as the screen; overflow collapses into "+N". */
+function pptBandTokens(slide, list, i, splits, d){
+  const F = PPT_FUNNEL, gap = PPT_TOKEN_GAP;
+  const cols = bandColumns(i, splits, F.w, F.h, d, gap, PPT_PAD_X, PPT_PAD_Y, SLIDE_SHAPE);
   const capacity = bandCapacity(cols);
   const shown = list.length>capacity ? Math.max(0, capacity-1) : list.length;
   const plus = list.length - shown;
-  const pos = placeInColumns(cols, shown+(plus?1:0), d, gap);
-  pos.forEach((p,k)=>{
-    const cx = fx+p.x+d/2, cy = fy+p.y+d/2;
-    if(k<shown) pptToken(slide, list[k], cx, cy, d, null);
-    else pptPlus(slide, plus, cx, cy, d, null);
+  placeInColumns(cols, shown+(plus?1:0), d, gap).forEach((p,k)=>{
+    const cx = F.x+p.x+d/2, cy = F.y+p.y+d/2;
+    if(k<shown) pptToken(slide, list[k], cx, cy, d, 'band');
+    else pptPlus(slide, plus, cx, cy, d, 'band');
   });
 }
-function pptPlanLegend(items, legW){
-  const cats = Array.from(new Set(items.map(x=>catInfo(x.p.classification).label))).map(l=>catInfo(l==='Unclassified'?'':l));
-  const padX = 0.16, padY = 0.13, rowH = 0.26, badge = 0.19, gapX = 0.3, titleH = 0.24;
-  if(!cats.length) return {cats, rows:0, cols:0, colW:0, h:0.34, padX, padY, rowH, badge, titleH};
-  const colW = Math.max(...cats.map(ci=>badge+0.08+pptTxtWidth(ci.label, 9))) + gapX;
-  const avail = legW-padX*2;
-  const cols = Math.max(1, Math.min(cats.length, Math.floor(avail/colW)));
-  const rows = Math.ceil(cats.length/cols);
-  return {cats, rows, cols, colW:avail/cols, h:padY*2+titleH+rows*rowH, padX, padY, rowH, badge, titleH};
+/* Stage name written along the funnel's top edge, rotated to its slope. */
+function pptStageLabel(slide, s, count, xu, widthIn){
+  const F = PPT_FUNNEL, top = SLIDE_SHAPE.top;
+  const ang = Math.atan2(pptUy(edgeY(top, xu+10)-edgeY(top, Math.max(0, xu-10))), pptUx(xu+10-Math.max(0, xu-10)));
+  const cx = F.x+pptUx(xu), cy = F.y+pptUy(edgeY(top, xu)), off = 0.2;
+  const lx = cx+Math.sin(ang)*off, ly = cy-Math.cos(ang)*off, w = 2.6, h = 0.3;
+  let fs = 15;
+  while(fs>8 && pptTxtWidth(s+'  '+count, fs)*1.1 > widthIn) fs -= 0.5;
+  slide.addText([{text:s, options:{}}, {text:'  '+count, options:{color:'5C7A88'}}],
+    {x:lx-w/2, y:ly-h/2, w, h, rotate:ang*180/Math.PI, fontFace:PPT_FONT_LIGHT, fontSize:fs, color:'0B3948', align:'center', valign:'middle', wrap:false, margin:0});
 }
-function pptLegend(slide, p, fx, legY, legW){
-  slide.addShape('roundRect', {x:fx, y:legY, w:legW, h:p.h, rectRadius:0.06, fill:{color:'FBFCFD'}, line:{color:'D6E4E4', width:1}});
-  slide.addText('Classification', {x:fx+p.padX, y:legY+p.padY, w:legW-p.padX*2, h:p.titleH, fontSize:9.5, bold:true, color:'0B3948', valign:'middle'});
-  p.cats.forEach((ci,i)=>{
-    const r = Math.floor(i/p.cols), c = i%p.cols;
-    const x = fx+p.padX+c*p.colW, y = legY+p.padY+p.titleH+r*p.rowH;
-    slide.addShape('ellipse', {x, y:y+(p.rowH-p.badge)/2, w:p.badge, h:p.badge, fill:{color:ci.bgHex}, line:{type:'none'}});
-    slide.addText(ci.code, {x, y:y+(p.rowH-p.badge)/2, w:p.badge, h:p.badge, fontSize:6.5, bold:true, align:'center', valign:'middle', color:ci.fgHex, wrap:false});
-    slide.addText(ci.label, {x:x+p.badge+0.07, y, w:p.colW-p.badge-0.12, h:p.rowH, fontSize:9, color:'122229', valign:'middle', wrap:false});
-  });
-}
-/* Plan bottom-up: legend and holding boxes are measured first, the funnel gets the rest. */
-function pptOverviewSlide(pptx, g){
-  const slide = pptx.addSlide({masterName:'SPI_OVERVIEW'});
-  pptHeader(slide, funnelTitle());
-  if(funnelCat) slide.addText('Classification: '+funnelCat, {x:0.45, y:PPT_HEADER_H+0.02, w:8, h:0.22, fontSize:9, color:'5C7A88'});
-  const fx = 0.4, fy = 1.15, fw = 12.5, SLIDE_H = 7.5;
-  const all = funnelOrdered(g);
-  const legendPlan = pptPlanLegend(all, fw);
-  const boxW = 4.05, boxGap = 0.14, boxPadTop = 0.17, boxPadBottom = 0.04;
-  const boxGroups = [['On hold',g.onHold,'gray'],['Stopped',g.stopped,'gray'],['Archived',g.archived,'dark']];
-  const fhGuess = Math.max(2.4, SLIDE_H-0.28-fy-0.16-1.0-0.14-legendPlan.h);
-  const layout = funnelLayout(g.bands.map(b=>b.length));
-  PPT_CIRCLE_D = Math.min(
-    Math.round(fitBandDiameter(g.bands, layout.splits, fw, fhGuess, PPT_CIRCLE_MAX, PPT_CIRCLE_MIN, 0.01, PPT_CIRCLE_GAP, PPT_PAD_X, PPT_PAD_Y)*100)/100,
-    ...boxGroups.map(([,list])=>list.length ? pptFitCircleD(boxW-0.2, 1.5, list.length) : PPT_CIRCLE_MAX)
-  );
-  const boxH = Math.max(0.44, ...boxGroups.map(([,list])=>list.length ? boxPadTop+pptCircleRows(list.length, boxW-0.2)*(PPT_CIRCLE_D+PPT_CIRCLE_GAP)-PPT_CIRCLE_GAP+boxPadBottom : boxPadTop+0.08));
-  const fh = Math.max(2.4, SLIDE_H-0.28-fy-0.16-boxH-0.14-legendPlan.h);
-  STATUS_ORDER.forEach((s,i)=>{
-    const b = layout.bounds[i];
-    slide.addText(s, {x:fx+fw*(b.left/100)+0.05, y:fy-0.3, w:fw*(b.width/100)-0.1, h:0.24, fontSize:12, bold:true, color:'0B3948', fit:'shrink'});
-    pptBand(slide, i, fx, fy, fw, fh, layout.splits);
-    pptBandTokens(slide, g.bands[i], i, layout.splits, fx, fy, fw, fh);
-  });
-  const boxY = fy+fh+0.16;
-  boxGroups.forEach(([label,list,style],i)=>{
-    const x = fx+i*(boxW+boxGap);
-    slide.addShape('roundRect', {x, y:boxY, w:boxW, h:boxH, rectRadius:0.06, fill:{color:'FBFCFD'}, line:{color:'D8E3E8', width:1}});
-    slide.addText(label, {x:x+0.1, y:boxY+0.035, w:boxW-0.2, h:0.16, fontSize:8.5, bold:true, color:'0B3948'});
-    if(list.length) pptCircles(slide, list, x+0.1, boxY+boxPadTop, boxW-0.2, style, boxH-boxPadTop-boxPadBottom);
-  });
-  pptLegend(slide, legendPlan, fx, boxY+boxH+0.14, boxW*3+boxGap*2);
-}
-function pptDetailSlide(pptx, x){
-  const p = x.p, slide = pptx.addSlide({masterName:'SPI_DETAIL'});
-  const ci = catInfo(p.classification), sc = STAGE_HEX[p.status] || '8A94A6';
-  pptHeader(slide, x.title);
-  slide.addText('SPI Global Exchange · '+x.rname+(p.archived?' · archived':''), {x:0.4, y:0.88, w:7.5, h:0.26, fontSize:10.5, color:'5C7A88', valign:'middle'});
-  const chipW = 0.34+pptTxtWidth(ci.label,10)+0.2, chipX = 12.9-chipW;
-  slide.addShape('roundRect', {x:chipX, y:0.88, w:chipW, h:0.26, rectRadius:0.13, fill:{color:'F2F7F7'}, line:{color:'D6E4E4', width:.75}});
-  slide.addShape('ellipse', {x:chipX+0.05, y:0.905, w:0.21, h:0.21, fill:{color:ci.bgHex}, line:{type:'none'}});
-  slide.addText(ci.code, {x:chipX+0.05, y:0.905, w:0.21, h:0.21, fontSize:7, bold:true, align:'center', valign:'middle', color:ci.fgHex, wrap:false});
-  slide.addText(ci.label, {x:chipX+0.3, y:0.88, w:chipW-0.36, h:0.26, fontSize:10, color:'122229', valign:'middle', wrap:false});
-  const pipeW = 12.5, segW = pipeW/STATUS_ALL.length, pipeY = 1.28, pipeH = 0.34;
-  STATUS_ALL.forEach((s,i)=>{
-    const on = s===p.status;
-    slide.addShape('roundRect', {x:0.4+i*segW, y:pipeY, w:segW-0.07, h:pipeH, rectRadius:0.06, fill:{color:on?STAGE_HEX[s]:'EEF4F4'}, line:{type:'none'}});
-    slide.addText(s, {x:0.4+i*segW, y:pipeY, w:segW-0.07, h:pipeH, fontSize:8, bold:on, align:'center', valign:'middle', color:on?(STATUS_DARK_TEXT[s]?'122229':'FFFFFF'):'5C7A88'});
-  });
-  const colY = 1.94, leftX = 0.4, leftW = 7.05, rightX = 7.68, rightW = 5.22, gap = 0.14, bottomY = 7.06;
-  function box(x0, y0, w0, h0, title, body, fs){
-    slide.addShape('roundRect', {x:x0, y:y0, w:w0, h:h0, rectRadius:0.07, fill:{color:'FBFCFD'}, line:{color:'D6E4E4', width:1}});
-    slide.addShape('roundRect', {x:x0, y:y0+0.04, w:0.055, h:h0-0.08, rectRadius:0.03, fill:{color:sc}, line:{type:'none'}});
-    slide.addText(String(title).toUpperCase(), {x:x0+0.18, y:y0+0.07, w:w0-0.32, h:0.2, fontSize:8.5, bold:true, color:'0B3948', charSpacing:0.6});
-    slide.addText((body||'').trim()||'—', {x:x0+0.18, y:y0+0.29, w:w0-0.34, h:h0-0.38, fontSize:fs||10, color:'122229', valign:'top', fit:'shrink'});
+/* Paused and archived groups share one row in the top-right corner: find the largest token size
+   (up to the funnel's) at which all of them fit side by side, else cap the columns and add "+N". */
+function pptPlanHolding(groups, dMax){
+  const A = PPT_HOLD_AREA, gap = PPT_TOKEN_GAP, groupGap = 0.35, labelH = 0.42;
+  const tokenH = A.h-labelH, k = groups.length;
+  const widthOf = (cols, d)=>cols.reduce((a,c)=>a+Math.max(c*(d+gap)-gap, 1.0), 0)+groupGap*(k-1);
+  for(let d=dMax; d>=PPT_TOKEN_MIN-1e-9; d-=0.01){
+    const rows = Math.max(1, Math.floor((tokenH+gap)/(d+gap)));
+    const cols = groups.map(g=>Math.ceil(g.list.length/rows));
+    if(widthOf(cols, d)<=A.w) return {d, rows, cols, groupGap, labelH};
   }
-  const rows = 4, h = (bottomY-colY-(rows-1)*gap)/rows;
-  [['Problem / starting point',p.problem],['Goal / benefit',p.benefit],['Next steps / remarks',p.nextSteps],['Notes',p.notes]]
-    .forEach(([t,v],i)=>box(leftX, colY+i*(h+gap), leftW, h, t, v));
-  [['Project lead',p.lead],['Region',x.rname],['Team members involved',p.team],['External partners',p.partners]]
-    .forEach(([t,v],i)=>box(rightX, colY+i*(h+gap), rightW, h, t, v, 9.5));
+  const d = PPT_TOKEN_MIN, rows = Math.max(1, Math.floor((tokenH+gap)/(d+gap)));
+  const total = Math.max(k, Math.floor((A.w-groupGap*(k-1)+gap*k)/(d+gap)));
+  const need = groups.map(g=>Math.ceil(g.list.length/rows)), needSum = need.reduce((a,b)=>a+b, 0);
+  const cols = need.map(n=>Math.max(1, Math.floor(n/needSum*total)));
+  return {d, rows, cols, groupGap, labelH};
+}
+function pptHolding(slide, groups, plan){
+  const A = PPT_HOLD_AREA, gap = PPT_TOKEN_GAP, d = plan.d;
+  const widths = plan.cols.map(c=>Math.max(c*(d+gap)-gap, 1.0));
+  let x = A.x + (A.w-(widths.reduce((a,b)=>a+b, 0)+plan.groupGap*(groups.length-1)));
+  const lineY = A.y+A.h-plan.labelH+0.06;
+  groups.forEach((g,gi)=>{
+    const cols = plan.cols[gi], cap = cols*plan.rows, w = widths[gi];
+    const shown = g.list.length>cap ? cap-1 : g.list.length, plus = g.list.length-shown;
+    const n = shown+(plus?1:0), rows = Math.ceil(n/cols);
+    for(let k=0; k<n; k++){
+      const r = Math.floor(k/cols), c = k%cols, rowN = Math.min(cols, n-r*cols);
+      const cx = x+(w-(rowN*(d+gap)-gap))/2+c*(d+gap)+d/2;
+      const cy = lineY-0.06-(rows-r)*(d+gap)+gap+d/2;
+      if(k<shown) pptToken(slide, g.list[k], cx, cy, d, g.style);
+      else pptPlus(slide, plus, cx, cy, d, g.style);
+    }
+    slide.addShape('line', {x, y:lineY, w, h:0, line:{color:'8A9AA0', width:0.75}});
+    slide.addText([{text:g.label, options:{}}, {text:'  '+g.list.length, options:{color:'8A9AA0'}}],
+      {x, y:lineY+0.03, w:w+0.3, h:0.3, fontFace:PPT_FONT_LIGHT, fontSize:14, color:'0B3948', valign:'middle', wrap:false, margin:0});
+    x += w+plan.groupGap;
+  });
+}
+/* Legend in the bottom-right corner, grown upwards: one column up to six classes, else two. */
+function pptLegend(slide, items){
+  const cats = Array.from(new Set(items.map(x=>catInfo(x.p.classification).label))).map(l=>catInfo(l==='Unclassified'?'':l));
+  if(!cats.length) return;
+  const x = 9.35, w = 3.5, bottom = 7.35, maxH = 2.45, padX = 0.2, titleH = 0.46, padY = 0.14;
+  const cols = cats.length>6 ? 2 : 1, rows = Math.ceil(cats.length/cols);
+  const rowH = Math.min(cols>1 ? 0.3 : 0.33, (maxH-titleH-padY*2)/rows);
+  const h = titleH+padY*2+rows*rowH, y = bottom-h, colW = (w-padX*2)/cols, badge = Math.min(0.24, rowH*0.8);
+  let fs = 12;
+  while(fs>7 && cats.some(ci=>badge+0.1+pptTxtWidth(ci.label, fs)*1.05 > colW-0.05)) fs -= 0.5;
+  slide.addShape('roundRect', {x, y, w, h, rectRadius:0.12, fill:{color:'FFFFFF'}, line:{color:'0B3948', width:2}});
+  slide.addText('Project classification', {x:x+padX, y:y+padY, w:w-padX*2, h:titleH-0.06, fontFace:PPT_FONT_LIGHT, fontSize:15, color:'0B3948', valign:'middle', margin:0});
+  cats.forEach((ci,i)=>{
+    const r = Math.floor(i/cols), c = i%cols;
+    const cx = x+padX+c*colW, cy = y+padY+titleH+r*rowH;
+    slide.addShape('teardrop', {x:cx, y:cy+(rowH-badge)/2, w:badge, h:badge, rotate:270, fill:{color:ci.bgHex}, line:{type:'none'}});
+    slide.addText(ci.code, {x:cx-0.05, y:cy+(rowH-badge)/2, w:badge+0.1, h:badge, fontFace:PPT_FONT, fontSize:Math.min(9, badge*34), align:'center', valign:'middle', color:ci.fgHex, wrap:false, margin:0});
+    slide.addText(ci.label, {x:cx+badge+0.1, y:cy, w:colW-badge-0.12, h:rowH, fontFace:PPT_FONT_LIGHT, fontSize:fs, color:'0B3948', valign:'middle', wrap:false, margin:0});
+  });
+}
+function pptOverviewSlide(pptx, g){
+  const slide = pptx.addSlide({masterName:'SPI_OVERVIEW'}), F = PPT_FUNNEL;
+  const layout = funnelLayout(g.bands.map(b=>b.length), 70, SLIDE_SHAPE), splits = layout.splits;
+  const d = Math.round(fitBandDiameter(g.bands, splits, F.w, F.h, PPT_TOKEN_MAX, PPT_TOKEN_MIN, 0.01, PPT_TOKEN_GAP, PPT_PAD_X, PPT_PAD_Y, SLIDE_SHAPE)*100)/100;
+  /* The funnel's mouth: a lighter rim peeking out left of the first band. */
+  slide.addShape('ellipse', {x:F.x-0.13, y:F.y, w:0.34, h:F.h, fill:{color:'0F5F68'}, line:{type:'none'}});
+  STATUS_ORDER.forEach((s,i)=>pptBand(slide, i, splits));
+  STATUS_ORDER.forEach((s,i)=>{
+    const mid = (splits[i]+splits[i+1])/2;
+    pptStageLabel(slide, s, g.bands[i].length, i ? mid : Math.max(Math.min(mid, 100), Math.min(60, splits[1]-10)), pptUx(splits[i+1]-splits[i]) + (i ? 0 : 0.6));
+    pptBandTokens(slide, g.bands[i], i, splits, d);
+  });
+  slide.addText(funnelTitle(), {x:2.3, y:0.12, w:4.6, h:0.62, fontFace:PPT_FONT_LIGHT, fontSize:30, color:'0B3948', valign:'middle', wrap:false, margin:0, fit:'shrink'});
+  if(funnelCat) slide.addText('Classification: '+funnelCat, {x:2.32, y:0.72, w:4.5, h:0.26, fontFace:PPT_FONT, fontSize:11, color:'5C7A88', margin:0});
+  const groups = [['On hold',g.onHold,'onhold'],['Stopped',g.stopped,'stopped'],['Archived',g.archived,'archived']]
+    .filter(([,list])=>list.length).map(([label,list,style])=>({label, list, style}));
+  if(groups.length) pptHolding(slide, groups, pptPlanHolding(groups, d));
+  pptLegend(slide, funnelOrdered(g));
+  slide.addText('Bühler AG · SPI Global Exchange · exported '+new Date().toLocaleDateString('en-GB', {day:'numeric', month:'short', year:'numeric'}),
+    {x:4.6, y:7.12, w:4.6, h:0.24, fontFace:PPT_FONT, fontSize:8, color:'9AA8AE', margin:0});
+}
+
+/* Detail slides: title and subtitle top left, stage chevrons top right, then the content boxes. */
+function pptLines(v){ return String(v||'').split(/\r?\n/).map(s=>s.replace(/^\s*[-–•*]\s*/, '').trim()).filter(Boolean); }
+function pptNames(v){ return String(v||'').split(/\r?\n|[,;]/).map(s=>s.trim()).filter(Boolean); }
+/* Largest body size at which every section (headline + wrapped items) fits the box. */
+function pptFitSections(sections, w, h, fsMax, fsMin){
+  for(let fs=fsMax; fs>=fsMin; fs-=0.5){
+    const head = Math.min(16, fs+2);
+    let used = 0;
+    for(const sec of sections){
+      used += head*1.3/72;
+      const items = sec.items.length ? sec.items : ['—'];
+      for(const it of items){
+        const lines = pptLayoutLines(pptWrapTokens(it), fs, (w-0.3)*0.93);
+        used += (lines ? lines.length : 99)*fs*1.2/72;
+      }
+      used += 0.06;
+    }
+    if(used<=h) return fs;
+  }
+  return fsMin;
+}
+/* Text of one content box; the box shape and icon come from the master unless drawShape is set. */
+function pptBoxText(slide, b, sections, dash, drawShape){
+  if(drawShape) slide.addText('', pptBoxShapeOpts(b));
+  const tx = b.icon ? b.x+1.7 : b.x+0.22;
+  const tw = b.x+b.w-0.2-tx, th = b.h-0.3;
+  const fs = pptFitSections(sections, tw, th, 14, 8);
+  const head = Math.min(16, fs+2), runs = [];
+  sections.forEach((sec,si)=>{
+    runs.push({text:sec.head, options:{fontFace:PPT_FONT_LIGHT, fontSize:head, color:'D7DE1F', breakLine:true, paraSpaceBefore:si?6:0}});
+    const items = sec.items.length ? sec.items : ['—'];
+    items.forEach((t,k)=>runs.push({text:t, options:{fontFace:PPT_FONT_LIGHT, fontSize:fs, color:'FFFFFF',
+      bullet:sec.items.length ? (dash ? {characterCode:'2013', indent:16} : {indent:14}) : false,
+      breakLine:!(si===sections.length-1 && k===items.length-1)}}));
+  });
+  slide.addText(runs, {x:tx, y:b.y+0.15, w:tw, h:th, valign:'middle', margin:0});
+}
+/* Downscale a project photo so a deck with many photos stays small. */
+async function pptPhoto(projectId){
+  const src = await loadProjectImage(projectId);
+  if(!src) return null;
+  try{
+    const img = await loadImage(src), s = Math.min(1, 1100/img.width, 700/img.height);
+    const c = document.createElement('canvas');
+    c.width = Math.round(img.width*s); c.height = Math.round(img.height*s);
+    c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+    return {data:c.toDataURL('image/jpeg', 0.85), w:c.width, h:c.height};
+  }catch(e){ return null; }
+}
+const PPT_STAMP = {'On Hold':['On hold','FF9B32'], 'Stopped':['Stopped','FF9B32']};
+function pptDetailSlide(pptx, x, photo){
+  const p = x.p, slide = pptx.addSlide({masterName:'SPI_DETAIL'}), ci = catInfo(p.classification);
+  let fs = 30;
+  while(fs>18 && pptTxtWidth(x.title, fs)*1.08 > 5.85) fs -= 1;
+  slide.addText(String(x.title||''), {x:0.42, y:0.28, w:5.9, h:0.6, fontFace:PPT_FONT_LIGHT, fontSize:fs, color:'FFFFFF', valign:'middle', margin:0, fit:'shrink'});
+  const sub = [x.rname, p.classification ? ci.label : ''].filter(Boolean).join(' · ');
+  slide.addText(sub, {x:0.42, y:0.86, w:5.9, h:0.4, fontFace:PPT_FONT_LIGHT, fontSize:18, color:'D7DE1F', valign:'middle', margin:0, fit:'shrink'});
+  /* Stage chevrons: the current stage in full colour with a white outline, the others dimmed. */
+  const pw = 1.4, step = 1.15, px0 = 6.42, py = 0.42, ph = 0.58;
+  STATUS_ORDER.forEach((s,i)=>{
+    const on = s===p.status;
+    slide.addShape(i ? 'chevron' : 'homePlate', {x:px0+i*step, y:py, w:pw, h:ph, fill:{color:STAGE_HEX[s], transparency:on?0:35},
+      line:on ? {color:'FFFFFF', width:2.5} : {color:'FFFFFF', width:0.5, transparency:70}});
+    slide.addText(s, {x:px0+i*step+(i?0.3:0.06), y:py, w:pw-(i?0.6:0.36), h:ph, fontFace:PPT_FONT, fontSize:9, bold:on, align:'center', valign:'middle',
+      color:STATUS_DARK_TEXT[s] ? '0B3948' : 'FFFFFF', margin:0});
+  });
+  const B = PPT_DETAIL_BOXES;
+  pptBoxText(slide, B.problem, [{head:'Status Quo / Problem Statement', items:pptLines(p.problem)}], true);
+  pptBoxText(slide, B.lead, [{head:'Project Lead:', items:pptNames(p.lead)}], false);
+  /* Paused or archived projects get a stamp in the goal box; the goal text makes room for it. */
+  const stamp = p.archived ? ['Archived','5C7A88'] : PPT_STAMP[p.status], S = 1.3;
+  const goalBox = stamp ? Object.assign({}, B.goal, {w:B.goal.w-S-0.25}) : B.goal;
+  pptBoxText(slide, goalBox, [{head:'Goal / Benefit', items:pptLines(p.benefit)}], true);
+  pptBoxText(slide, B.partners, [{head:'External Partners:', items:pptNames(p.partners)}], false);
+  const progress = [{head:'Current Progress / Next Steps', items:pptLines(p.nextSteps)}];
+  if(photo){
+    const N = PPT_NOTES_BOX, bh = 1.92, s = Math.min(N.w/photo.w, bh/photo.h), w = photo.w*s, h = photo.h*s;
+    slide.addImage({data:photo.data, x:N.x+(N.w-w)/2, y:1.1+(bh-h)/2, w, h});
+    if(pptLines(p.notes).length) progress.push({head:'Notes', items:pptLines(p.notes)});
+  } else {
+    pptBoxText(slide, PPT_NOTES_BOX, [{head:'Notes:', items:pptLines(p.notes)}], false, true);
+  }
+  pptBoxText(slide, B.progress, progress, true);
+  pptBoxText(slide, B.colleagues, [{head:'Colleagues Involved:', items:pptNames(p.team)}], false);
+  if(stamp){
+    const sx = B.goal.x+B.goal.w-S-0.12, sy = B.goal.y+(B.goal.h-S)/2;
+    slide.addShape('teardrop', {x:sx, y:sy, w:S, h:S, rotate:270, fill:{color:stamp[1]}, line:{color:'FFFFFF', width:1.5},
+      shadow:{type:'outer', blur:8, offset:3, angle:45, opacity:0.35, color:'000000'}});
+    slide.addText(stamp[0], {x:sx, y:sy, w:S, h:S, fontFace:PPT_FONT, fontSize:15, color:'FFFFFF', align:'center', valign:'middle', margin:0});
+  }
 }
 
 /* ---------------- User management cockpit ----------------
